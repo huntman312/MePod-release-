@@ -9,5 +9,5 @@ ReportLab - install instructions here https://www.reportlab.com/dev/install/vers
 2. Either green or blue not both.
 3. Final pdf is saved in folder named orders to be sent
 
-Folder named oldMePod is the old python shell script.
+Folder named oldMePod is the old python shell script and old file/folder database.
 
