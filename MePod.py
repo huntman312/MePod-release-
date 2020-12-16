@@ -29,7 +29,23 @@ def date_of_order():
 # tkinter window
 root = Tk()
 
-root.title("MePod v1.10")
+root.title("MePod v1.12")
+root.iconbitmap('D:/vs code proj/MePod/MePod/EXE builder/icon.ico')
+
+root.geometry("800x350")
+
+my_notbook = ttk.Notebook(root)
+my_notbook.pack()
+my_frame1 = Frame(my_notbook, width=800, height=350)
+my_frame2 = Frame(my_notbook, width=800, height=350)
+
+my_frame1.pack(fill="both", expand=1)
+my_frame2.pack(fill="both", expand=1)
+
+my_notbook.add(my_frame1, text="Order Maker")
+my_notbook.add(my_frame2, text="Add To Database")
+
+
 ### tool database ###
 
 
@@ -55,9 +71,9 @@ def toolDataBase():
         return {'1': ('AA82435', 'SCREW M6X20  '), '2': ('CN35052', 'EXHAUST COVER HOLDER  '), '3': ('CN349138', 'EXHAUST COVER  '), '4': ('CN35956', 'PROTECTOR  '), '5': ('CN35281', 'EXHAUST FILTER A  '), '6': ('CN36095', "EXHAUST FILT \\'95 B  "), '7': ('9840209', 'HEX. BOLT 5X25  '), '8': ('CN70071', 'CYLINDER CAP UNfT  '), '9': ('CN35286', 'CYLINDER CAP SEAL  '), '10': ('CN35132', 'PLAIN WASHER 51.2X58X0.5  '), '11': ('KK23655', 'COMP. SPRING 3655  '), '12': ('HH11141', '0-RING ARP568-130  '), '13': ('CN35290', 'HEAD VALVE PISTON  '), '14': ('HH12101', '0-RING AG55  '), '15': ('CN34994', 'HEAD VALVE SEAL  '), '16': ('CN36107', 'PLAIN WASHER B  '), '17': ('CN35289', 'PISTON STOP  '), '18': ('HH11807', '0-RING P38  '), '19': ('CN70028', 'MAIN PISTON UNIT  '), '20': ('CN35264', 'CYLINDER  '), '21': ('HH15165', '0-RING A 2.6X46.5  '), '22': ('CN35131', 'CHECK VALVE  '), '23': ('CN35265', 'CYLINDER RING  '), '24': ('HH12108', '0-RING AG60  '), '25': ('CN80498', 'FRAME UNIT  '), '26': ('CN36127', 'NAME PLATE  '), '': ('', ''), '27': ('CN35636', 'WARNING LABEL(FRAME)  '), '28': ('CN35075', 'TRIGGER LOCK LEVER  '), '30': ('CN35074', 'TRIGGER LOCK DIAL  '), '31': ('KK23507', 'SPRING 3507  '), '32': ('FF21235', 'SPRING PIN 3X30  '), '33': ('CN33690', 'AIR FILTER  '), '34': ('HH12118', '0 RING 1AG35  '), '35': ('CN35840', 'END CAP  '), '36': ('BB40405', 'BOLT 5)(25  '), '37': ('HH11125', '0-RING AP12  '), '38': ('CN31323', 'TRIGGER VALVE HOUSING  '), '39': ('FF30161', 'PIN 161  '), '40': ('HH11105', '0-RING AP7  '), '41': ('HH11138', '0-RING A920  '), '42': ('HH11119', '0-RING AP6  '), '43': ('HH11209', '0-RING 1BP7  '), '44': ('CN33010', 'PILOT VALVE  '), '45': ('HH11113', '0-RING AP9  '), '46': ('KK24123', 'COMPRESSION SPRING 4123  '), '47': ('HH11901', '0-RING 1 4 X 2.5  '), '48': ('CN35779', 'TRIGGER VALVE STEM  '), '49': ('CN33009', 'TRIGGER VALVE CAP  '), '50': ('CN35115', 'CONTACT LEVER  '), '51': ('FF22402', 'SPRING PIN 3X16  '), '52': ('CN35714', 'TRIGGER CONTACT ARM GUIDE B  '), '53': ('CN35059', 'TRIGGER CONTACT ARM GUIDE A  '), '54': ('CN35962', 'NOSE  '), '55': ('KK23736', 'COMPRESSION SPRING 3736  '), '56': ('KK23735', 'COMPRESSION SPRING 3735  '), '57': ('CN35004', 'CONTACT BUMPER  '), '58': ('CN35780', 'CONTACT ARM A  '), '59': ('CN35007', 'ADJUST DIAL  '), '60': ('CN35051', 'ADJUST DIAL COVER  '), '61': ('TA15789', 'LABELAOJUST DIAL  '), '62': ('CN35000', 'BUMPER  '), '63': ('HH14904', '0-RING AS 568-032  '), '65': ('FF31264', 'STRAIGHT PIN 1264  '), '66': ('CN34486', 'CHECK PAWL  '), '67': ('EE39609', 'RUBBER WASHER 1.8X6X2  '), '68': ('KK33259', 'TORSION SPRING 3259  '), '69': ('EE39602', 'WASHER 7  '), '70': ('KK23710', 'COMP. SPRING 3710  '), '71': ('KK23788', 'COMP. SPRING 3788  '), '72': ('N36092', 'FEED PAWL  '), '73': ('FF41815', 'PIN 1815  '), '74': ('BB40208', 'BOLT 6X28  '), '75': ('FF41258', 'PIN 1258  '), '76': ('FF41599', 'RIN 1599  '), '77': ('KK33261', 'TORSION SPRING 3261  '), '78': ('C533679', 'DOOR LUTCH  '), '79': ('CN35950', 'DOOR  '), '80': ('C536093', 'LATCH  '), '81': ('KK23457', 'COM. SPRING 3457  '), '82': ('FF31257', 'STRAIGHT PIN 1257  '), '83': ('8840407', 'BOLT 5 X 20  '), '84': ('C536121', 'CONTACT ARM C  '), '85': ('HH11903', '0-RING 1A 1.2 X 4  '), '86': ('C570150', 'CONTACT ARM B  '), '87': ('KK23332', 'COM.SPRING 3332  '), '88': ('JJ10404', 'E-RING 3.2  '), '89': ('C531083', 'HOOK, DUST COVER  '), '90': ('CN35279', 'DUST COVER  '), '91': ('HH11107', '0-RING AP18  '), '92': ('CN35271', 'FEED PISTON  '), '93': ('KK23504', 'COMPRESSION SPRING 3504  '), '94': ('KK23724', 'COMP. SPRING 3724  '), '95': ('C531953', 'FEED PISTON STOP  '), '96': ('CN35285', 'SPRING LLER  '), '97': ('JJ22408', 'C-RING 24  '), '98': ('CN35969', 'COVER  '), '99': ('CC00401', 'ELASTIC STOP NUT M5  '), '100': ('CN35651', 'MAGAZINE COVER  '), '101': ('CN36129', 'CAUTION PLATE  '), '102': ('CN31963', 'POST CAP  '), '103': ('HN10389', 'NAIL SUPPORT  '), '104': ('CN35388', 'MAGAZINE  '), '105': ('FF41287', 'PIN 1287  '), '106': ('KK13051', 'SPRING 3051  '), '107': ('CN30601', 'SPACER  '), '108': ('CN30602', 'SPRING HOOK  '), '109': ('CN35252', 'LABEL, TRIGGER LOCK  '), '110': ('CC49411', 'SPECIAL NUT M5  '), '112': ('CN33627', 'PILOT VALVE  '), '113': ('KK24123', 'COMPRESSION SPRING 4123  '), '114': ('CN33723', 'TRIGGER VALVE STEM  '), '115': ('CN31346', 'TRIGGER VALVE CAP  '), '116': ('KK33247', 'SPRING 3247  '), '117': ('TA16138', 'S.T. LEVER  '), '118': ('KK33144', 'TORSION SPRING 3144  '), '119': ('CN35648', 'TRIGGER  '), '120': ('KK23282', 'COM. SPRING 82  '), '121': ('CN35266', 'CONTACT ARM C  '), '122': ('CN35140', 'CONTACT ARM A  '), '123': ('CN81011', 'BODY HUNGER KIT  '), '124': ('BB40222', 'SCREW M5X30  '), '125': ('CN36120', 'BODY HUNGER  '), '127': ('KK23653', 'COMP SPRING 3653  '), '200': ('CN81008', 'O-RING KIT CN565S,D  '), '201': ('CN81020', 'TIRGER VALVE KIT  '), '202': ('CN81012', 'ARM GUIDE KIT  '), '203': ('CN81015', 'ST KIT FOR CN5650,5} ')}
     elif b == "MAX" and m == "CN890F2":
         return {'': ('', ''), '1': ('KN12666', 'SCREW 5X12  '), '2': ('KN12187', 'EXHAUST FILTER  '), '3': ('KN12194', 'EXHAUST COVER  '), '4': ('KN12669', 'SCREW 6X28  '), '5': ('KN70148', 'CYLINDER CAP UNIT  '), '6': ('KK24182', 'COMPRESSION SPRING 2653  '), '7': ('CN38169', 'PISTON STOP  '), '8': ('CN38166', 'HEAD VALVE PISTON  '), '9': ('KN12650', 'O-RING AS568-150  '), '10': ('KN12645', 'O-RING AS568-142  '), '11': ('KN70142', 'CYLINDER CAP SEAL UNIT  '), '12': ('KN12613', 'O-RING 4.5X48.8  '), '13': ('CN70462', 'MAIN PISTON UNIT  '), '14': ('KN12189', 'CYLINDER SEAL  '), '15': ('KN12190', 'CYLINDER RING  '), '16': ('KN12649', 'O-RING 1AG100  '), '17': ('KN12648', 'O-RING 1AG70  '), '18': ('KN12583', 'CYLINDER  '), '19': ('KN12614', 'CHECK PAWL  '), '20': ('KN12601', 'BUMPER  '), '21': ('CN81283', 'FRAME ASSY  '), '22': ('KN12205', 'NAME LABEL A  '), '23': ('KN12206', 'NAME LABEL B  '), '24': ('BB40846', 'SCREW 5X50  '), '25': ('CN35685', 'END CAP FILTER SA-10  '), '26': ('KN81039', 'END CAP ASSY  '), '27': ('EE31121', 'WASHER 1-5 (BLACK)  '), '28': ('KN12643', 'O-RING 1AP12  '), '29': ('KN12644', 'O-RING 1AP20  '), '30': ('CN33909', 'TRIGGER VALVE HOUSING  '), '31': ('KN12660', 'STRAIGHT PIN 2660  '), '32': ('KN12642', 'O-RING 1AP6  '), '33': ('HH11209', 'O-RING 1BP7 N10028  '), '34': ('CN31589', 'PILOT VALVE  '), '35': ('KN12641', 'O-RING 1AP9  '), '36': ('KN12654', 'COMPRESSION SPRING 2654  '), '37': ('KN12658', 'TRIGGER VALVE STEM  '), '38': ('KN12647', 'O-RING 1B 1.4X2.5  '), '39': ('CN33910', 'TRIGGER VALVE CAP  '), '40': ('KN12635', 'CONTCT LEVER B  '), '41': ('KN12630', 'CONTCT LEVER A  '), '42': ('KN12401', 'TRIGGER  '), '43': ('FF22402', 'SPRING PIN 3X16 (LIGHT LOAD)  '), '44': ('HS10145', 'SWITCH LEVER A  '), '45': ('KN12620', 'SWITCH LEVER B  '), '46': ('CN38099', 'SWITCH SPRING  '), '47': ('KK23129', 'COMPRESSION SPRING 3129  '), '48': ('KK23653', 'COMP. SPRING 3653  '), '49': ('HS10148', 'ARM GUIDE  '), '50': ('HN10357', 'CONTACT BUMPER  '), '51': ('CN38104', 'CONTACT ARM A  '), '52': ('CN38101', 'ARM GUIDE PIN  '), '53': ('KN12651', 'O-RING AS568-144  '), '54': ('KN12621', 'TRIGGER LOCK DIAL  '), '55': ('KK23507', 'SPRING 3507  '), '56': ('KN12622', 'TRIGGER LOCK LEVER  '), '57': ('FF21235', 'SPRING PIN 3X30  '), '58': ('CC49411', 'SPECIAL NUT M5  '), '59': ('TT05426', 'SWIVEL JOINT  '), '60': ('CN38111', 'NOSE  '), '61': ('EE39602', 'WASHER 7  '), '62': ('KN12670', 'SCREW 8X28  '), '63': ('FF31520', 'STRAIGHT PIN 1520  '), '64': ('KN12671', 'SCREW 5X28  '), '65': ('CN38112', 'FEED PAWL  '), '66': ('CN38115', 'STRAIGHT PIN 8115  '), '67': ('CN38114', 'COMPRESSION SPRING 8114  '), '68': ('CN38113', 'COMPRESSION SPRING 8113  '), '69': ('HH11132', 'O-RING 1AP10A CN65072  '), '70': ('CN38116', 'FEED PISTON  '), '71': ('HH11143', 'O-RING AP21 851437  '), '72': ('CN38123', 'COMPRESSION SPRING 8123  '), '73': ('KK23225', 'SPRING 3225  '), '74': ('CN37528', 'FEED PISTON STOP  '), '75': ('CN37538', 'SPRING COLLAR  '), '76': ('JJ22407', 'C-RING 26  '), '77': ('CN38124', 'DOOR  '), '78': ('FF41599', 'PIN 1599  '), '79': ('CN38127', 'TORSION SPRING 8127  '), '80': ('HN11405', 'DOOR LATCH  '), '81': ('CN38131', 'COMPRESSION SPRING 8131  '), '82': ('CN35898', 'CHECK PAWL  '), '83': ('GN12070', 'RUBBER WASHER 1.7X6X2  '), '84': ('FF41258', 'PIN 1258  '), '85': ('CN38137', 'COMPRESSION SPRING 8137  '), '86': ('CN38138', 'HEX.NUT WITH FLANGE M5  '), '87': ('CN38172', 'CONTACT ARM B  '), '88': ('CN38141', 'STEEL BALL 3  '), '89': ('CN38142', 'COMPRESSION SPRING 8142  '), '90': ('CN38174', 'ADJUST DIAL  '), '91': ('CN38173', 'CONTACT BOLT  '), '92': ('HH19127', 'O-RING A 1.5X5.5  '), '93': ('CN38133', 'CONTACT ARM C  '), '94': ('CN38139', 'ADJUST STOPPER  '), '95': ('CN38146', 'CONTACT TIP  '), '96': ('CN31083', 'HOOK, DUST COVER  '), '97': ('CN38148', 'DUCT COVER  '), '98': ('CN38151', 'ARM COVER  '), '99': ('CN38159', 'NAIL SUPPORT  '), '100': ('CN38165', 'E-RETAINING RING 6  '), '101': ('CN38161', 'PLANE WASHER 8  '), '102': ('CN38164', 'COMPRESSION SPRING 8164  '), '103': ('CN38163', 'BASE DIAL  '), '104': ('CN38160', 'NAIL POST  '), '105': ('FF31642', 'STRAIGHT PIN 8168  '), '106': ('CN38153', 'NAIL LENGTH LABEL  '), '107': ('CN38167', 'STRAIGHT PIN 8167  '), '108': ('CN70535', 'MAGAZINE  '), '109': ('CN38162', 'TORSION SPRING 8162  '), '110': ('CN70534', 'MAGAZINE CAP  '), '111': ('CN38347', 'WARNING LABEL  '), '112': ('HH11105', 'O-RING AP7 N5525  '), '113': ('KN12655', 'COMPRESSION SPRING 2655  '), '114': ('KN70182', 'HOOK ASSY  '), '115': ('CN38344', 'HOOK SPACER  '), '116': ('EE39856', 'SP WASHER 5  '), '117': ('KN12619', 'PLANE WASHER 5.1X12X1.2  '), '118': ('KN12541', 'HANGER  '), '119': ('BB40227', 'SCREW 6X35  '), '120': ('CN32246', 'PILOT VALVE(REPLACES CN31589)  '), '121': ('KK24123', 'COMPRESSION SPRING 4123  '), '122': ('CN35128', 'TRIGGER VALVE STEM  '), '123': ('HN10100', 'CONTACT LVER  '), '124': ('KK33300', 'SPRING 3300  '), '125': ('HS10118', 'TRIGGER  '), '126': ('HN10400', 'ARM GUIDE PIN  '), '127': ('HS10117', 'CONTACT ARM A GUIDE  '), '128': ('KK23736', 'COMPRESSION SPRING 3736  '), '129': ('KK23735', 'COMPRESSION SPRING 3735  '), '130': ('HN10401', 'CONTACT ARM A  '), '201': ('KN81070', 'TRIGGER VALVE KIT  '), '202': ('CN81279', 'ARM GUIDE KIT  '), '203': ('CN81280', 'O-RING KIT  '), '204': ('CN81278', 'SEQUENTIAL TRIP KIT  '), '205': ('CN70464', 'CONTACT ARM C FLAT  '), '206': ('KN81054', 'BODY HANGER KIT  '), '207': ('CN70536', 'MAGAZINE ASSY  '), '208': ('CN80006', 'CONTACT ARM ASSY ')}
-    elif b == "MAX" and m == "SN890CH3_34":
+    elif b == "MAX" and m == "SN890CH3/34":
         return {'': ('', ''), '1': ('KN12666', 'SCREW 5X12  '), '2': ('KN12678', 'EXHAUST GUIDE  '), '3': ('KN12194', 'EXHAUST COVER  '), '4': ('KN12669', 'SCREW 6X28  '), '5': ('KN70168', 'CYLINDER CAP UNIT  '), '6': ('KK24182', 'COMPRESSION SPRING 4182  '), '7': ('CN38169', 'PISTON STOP  '), '8': ('KN12656', 'HEAD VALVE PISTON  '), '9': ('KN12650', 'O-RING AS568-150  '), '10': ('KN12645', 'O-RING AS568-142  '), '11': ('KN70142', 'CYLINDER CAP SEAL UNIT  '), '12': ('KN12613', 'O-RING 4.5X48.8  '), '13': ('KN81092', 'MAIN PISTON UNIT  '), '14': ('KN12628', 'CYLINDER SEAL  '), '15': ('KN12190', 'CYLINDER RING  '), '16': ('KN12649', 'O-RING 1AG100  '), '17': ('KN12648', 'O-RING 1AG70  '), '18': ('KN12634', 'CYLINDER  '), '19': ('KN12614', 'CHECK VALVE  '), '20': ('KN12193', 'BUMPER  '), '21': ('KN81069', 'FRAME  '), '22': ('KN12205', 'NAME LABEL A  '), '23': ('KN12206', 'NAME LABEL B  '), '24': ('TT05426', 'SWIVEL JOINT  '), '25': ('CN35685', 'END CAP FILTER SA-10  '), '26': ('KN81039', 'END CAP ASSY  '), '27': ('EE31121', 'WASHER 1-5 (BLACK)  '), '28': ('KN12643', 'O-RING 1AP12  '), '29': ('KN12644', 'O-RING 1AP20  '), '30': ('CN33909', 'TRIGGER VALVE HOUSING  '), '31': ('KN12660', 'STRAIGHT PIN 2660  '), '32': ('KN12642', 'O-RING 1AP6  '), '33': ('HH11209', 'O-RING 1BP7  '), '34': ('CN31589', 'PILOT VALVE  '), '35': ('KN12641', 'O-RING 1AP9  '), '36': ('KN12654', 'COMPRESSION SPRING 2654  '), '37': ('KN12658', 'TRIGGER VALVE STEM  '), '38': ('KN12647', 'O-RING 1B 1.4X2.5  '), '39': ('CN33910', 'TRIGGER VALVE CAP  '), '40': ('KK33404', 'SPRING 3404  '), '41': ('KN12729', 'CONTACT LEVER DS  '), '42': ('CN35648', 'TRIGGER (ORANGE)  '), '43': ('FF22402', 'SPRING PIN 3X16 (LIGHT LOAD)  '), '44': ('KN12734', 'TRIGGER PUSHER  '), '45': ('KK23129', 'COMPRESSION SPRING 3129  '), '46': ('KN12618', 'EXHAUST SEAL  '), '47': ('KN12730', 'ARM GUIDE  '), '48': ('KK23973', 'COMPRESSION SPRING 3973  '), '49': ('KN12731', 'CONTACT ARM A  '), '50': ('KN12728', 'CONTACT LEVER CT  '), '51': ('CN35714', 'TRIGGER (BLACK)  '), '52': ('KN12651', 'O-RING AS568-144  '), '53': ('KN12200', 'ADJUST DIAL  '), '54': ('KN12727', 'NOSE  '), '55': ('KN12668', 'SCREW 5X10  '), '56': ('KN12720', 'COMPRESSION SPRING 2720  '), '57': ('KN12670', 'SCREW 8X28  '), '58': ('KN12619', 'PLANE WASHER 5.1X12X1.2  '), '59': ('KN12717', 'MAGAZINE GUIDE B  '), '60': ('KN12616', 'MAGAZINE GUIDE A  '), '61': ('KN12420', 'NAIL STOPPER B  '), '62': ('KN12575', 'CONTACT BOLT  '), '63': ('KN12652', 'O-RING 1A 1.5X5  '), '64': ('KN70120', 'CONTACT ARM B UNIT  '), '65': ('KN12672', 'E-RETAINING RING 5  '), '66': ('KN12624', 'NAIL GUIDE B  '), '67': ('KN12722', 'NAIL GUIDE A  '), '68': ('KN12716', 'NAIL COVER  '), '69': ('KN12574', 'TAIL HANGER  '), '70': ('CC49411', 'SPECIAL NUT M5(REPLACES TA15554)  '), '71': ('KN12715', 'TAIL COVER  '), '72': ('KN12667', 'SCREW 5X14  '), '73': ('KN12419', 'NAIL STOPPER  '), '74': ('KN70185', 'MAGAZINE  '), '75': ('EE39609', 'RUBBER WASHER 1.8X6X2  '), '76': ('KN12719', 'SPIRAL SPRING 2719  '), '77': ('KN12661', 'STRAIGHT PIN 2661  '), '78': ('KN12714', 'PUSHER HOLDER  '), '79': ('KN12712', 'PUSHER  '), '80': ('KN12662', 'PARALLEL PIN 2662  '), '81': ('KN12622', 'TRIGGER LOCK LEVER  '), '82': ('KK23507', 'STRAIGHT PIN 2662  '), '83': ('KN12621', 'TRIGGER LOCK DIAL  '), '84': ('KN12723', 'SPRING COLLAR  '), '85': ('KN12573', 'ARM COVER  '), '86': ('CN31083', 'HOOK, DUST COVER  '), '87': ('KN12655', 'COMPRESSION SPRING 2655  '), '88': ('FF41870', 'STEP PIN 1870  '), '89': ('FF21235', 'SPRING PIN 3X30  '), '90': ('KN12738', 'WARNING LAVEL  '), '91': ('KN12739', 'MODEL NAME LABEL  '), '92': ('KN12667', 'SCREW 5X14  '), '93': ('KN12676', 'NAIL GUIDE C  '), '94': ('KN70182', 'HOOK ASSY  '), '95': ('BB40470', 'SCREW 5X32  '), '96': ('KN11237', 'CONTACT TIP  '), '97': ('CN38310', 'HEXAGON NUT WITH FLANGE M5  '), '201': ('KN81017', 'TRIGGER VALVE KIT  '), '202': ('KN70180', 'DS TRIGGER ASSY  '), '203': ('KN70187', 'ARM GUIDE KIT  '), '204': ('KN70181', 'CT TRIGGER ASSY  '), '205': ('KN81074', 'O-RING KIT ')}
-    elif b == "MAX" and m == "TA551B_16-11":
+    elif b == "MAX" and m == "TA551B/16-11":
         return {'1': ('BB40470', 'SCREW 5X32  '), '2': ('TA18832', 'CYLINDER CAP (TA16996 replaced)  '), '3': ('CN38344', 'HOOK SPACER  '), '4': ('FF31535', 'STRAIGHT PIN 1535  '), '5': ('TA16997', 'CYLINDER CAP SEAL  '), '6': ('CN37993', 'EXHAUST SEAL  '), '7': ('CN38003', 'O-RING AP48  '), '8': ('CN37216', 'HEAD VALVE GUIDE  '), '9': ('CN38020', 'COMP.SPIN 3934  '), '10': ('HH11138', 'O-RING AP20  '), '11': ('CN37217', 'HEAD VALVE PISTON  '), '12': ('HH12108', 'O-RING AG60(FORMER HH12114)  '), '13': ('CN35060', 'CYLINDER RING  '), '14': ('CN37824', 'CYLINDER SEAL (CN34682 replaced)  '), '15': ('HH19165', 'O-RING A 2.6X46.5 (CN-57)  '), '16': ('CN35131', 'CHECK VALVE  '), '17': ('TA18836', 'CYLINDER (TA16998 replaced)  '), '18': ('HH11807', 'O-RING P38  '), '19': ('TA70278', 'MAIN PISTON UNIT  '), '20': ('TA17016', 'BUMPER  '), '21': ('TA17017', 'NOZZLE  '), '22': ('KN70182', 'HOOK ASSY  '), '23': ('TA70452', 'FRAME ASSY  '), '26': ('TA18688', 'NOSE  '), '27': ('TA18523', 'WEAR CHIP  '), '28': ('AA22207', 'COUNTERSUNK SCREW 4 X 5  '), '29': ('TA18509', 'DRIVER GUIDE A  '), '30': ('TA70447', 'LATCH UNIT  '), '31': ('FF21275', 'SPRING PIN 4X16  '), '32': ('TA18508', 'DRIVER GUIDE A  '), '33': ('BB40465', 'SCREW M6X45  '), '34': ('FF21611', 'ROLL PIN 3X32 AW  '), '35': ('KN12621', 'TRIGGER LOCK DIAL  '), '36': ('KK23507', 'SPRING 3507  '), '37': ('TA17007', 'CONTACT ARM A  '), '38': ('TA17008', 'CONTACT ARM B  '), '39': ('BB40467', 'HEX SOC HD SCR 5MM X 6MM  '), '40': ('TA17001', 'CONTACT ARM GUIDE  '), '41': ('KK23807', 'COMP SPRING 3807  '), '42': ('KK23282', 'COM. SPRING 3282  '), '43': ('CC49409', 'NUT  '), '44': ('KN12622', 'TRIGGER LOCK LEVER  '), '45': ('TT05423', 'SWIVEL JOINT  '), '46': ('CN81239', 'END CAP ASSY  '), '47': ('TA17024', 'FILTER A  '), '48': ('HH11125', 'O-RING AP12 CN65086  '), '49': ('CN31323', 'TRIGGER VALVE HOUSING  '), '50': ('HH11119', 'O-RING AP6 N10027  '), '51': ('HH11209', 'O-RING 1BP7 N10028  '), '52': ('FF30161', 'PIN 161  '), '53': ('CN31589', 'PILOT VALVE  '), '54': ('HH11113', 'O-RING AP9 N5528  '), '55': ('KK24123', 'COMPRESSION SPRING 4123  '), '56': ('CN35779', 'TRIGGER VALVE STEM  '), '57': ('HH11901', 'O-RING 1.4 X 2.5 CN65020  '), '58': ('CN33009', 'TRIGGER VALVE CAP  '), '59': ('CN35115', 'CONTACT LEVER  '), '60': ('CN35714', 'TRIGGER  '), '61': ('FF22402', 'SPRING PIN 3X16 (LIGHT LOAD)  '), '62': ('TA18511', 'PUSHER  '), '63': ('TA18512', 'CLICK LEVER  '), '64': ('KK44023', 'SPRING 4023  '), '65': ('FF21613', 'ROLL PIN 6X20  '), '66': ('TA18510', 'MAGAZINE  '), '67': ('TA70453', 'STAPLE COVER ASSY  '), '68': ('TA19939', 'WARNING LABEL  '), '69': ('KK23287', 'COM. SPRING 3287  '), '70': ('TT15401', 'HEX. BAR WRENCH 4  '), '71': ('BB40460', 'SCREW 5X14  '), '72': ('TA17013', 'TAIL HANGER  '), '73': ('BB40401', 'SCREW 5 X 22  '), '74': ('CN35714', 'TRIGGER (CN35648 replaced)  '), '75': ('KK29015', 'COMP. SPRING 9015  '), '76': ('KK33247', 'SPRING 3247  '), '77': ('TA16138', 'S.T. LEVER  '), '78': ('KK33144', 'TORSION SPRING 3144  '), '79': ('CN33627', 'PILOT VALVE  '), '80': ('CN33723', 'TRIGGER VALVE STEM  '), '81': ('CN31346', 'TRIGGER VALVE CAP  '), '82': ('TA17023', 'CONTACT ARM A  '), '83': ('FF41599', 'PIN 1599  '), '84': ('GN10424', 'SPRING COLLAR  '), '85': ('FF41842', 'PIN 1842  '), '86': ('EE39609', 'RUBBER WASHER 1.8X6X2  '), '200': ('TA81012', 'O-RING KIT  '), '201': ('TA81178', 'TRIGGER VALVE KIT  '), '202': ('TA81011', 'SEQ. TRIP ASSY  '), '203': ('TA81014', 'STEP PIN KIT  '), '204': ('CN80150', 'SEQUENTIAL TRIGGER VALVE ASSY ')}
     elif b == "TECH" and m == "PCN55M.1":
         return {'6': ('JHS0625BWF', 'HEX.SOC.HD.BOLT'), '7': ('D15800702', 'PROTECTOR'), '8A': ('A15800802A', 'CAP ASM.'), '8': ('A15800802', 'CAP'), '10': ('F15801001', 'PISTON STOPPER'), '11': ('G15801102', 'SPRING'), '12': ('D15801201', 'WASHER'), '13': ('ID5207W262', 'O-RING'), '14': ('ID4150W260', 'O-RING'), '15': ('F15801502', 'PISTON HEAD VALVE'), '16': ('F15801601', 'SEAL'), '17': ('ID3770W350', 'O-RING'), '18A': ('H15801802A', 'DRIVER ASSEMBLY'), '19': ('C15801901', 'CYLINDER'), '20': ('ID5047W262', 'O-RING'), '21': ('F15802101', 'CYLINDER RING'), '22': ('F15802201', 'COLLAR'), '23': ('ID6940W310D90', 'O-RING'), '25': ('F15802502', 'GASKET'), '26': ('A15802601', 'BODY'), '27': ('F19003203', 'RUBBER GRIP'), '28': ('ID4735W178', 'O-RING'), '29': ('A16002301', 'COVER'), '54': ('JRP030P30', 'ROLLED PIN'), '24': ('F15802402', 'BOTTOM BUMPER'), '44': ('ID4735W178', 'O-RING'), '30A1': ('E15803001A1', 'NOSE ASM.'), '55': ('ID0400W150', 'O-RING'), '39': ('JCH2600W', 'C-RING'), '38': ('D15803801', 'SPRING COLLAR'), '37': ('F15803701', 'FEED PISTON STOP'), '36': ('H15803601', 'STEPPED PIN'), '35': ('G15803501', 'SPRING'), '34': ('G15803401', 'SPRING'), '90': ('G15809001', 'SPRING'), '33': ('ID2080W240', 'O-RING'), '32': ('H15803202', 'FEED PISTON'), '31': ('ID0980W240', 'O-RING'), '30': ('E15803001', 'NOSE'), '43': ('H15804301', 'STEPPED PIN'), '42': ('G15804201', 'TOR.SPRING'), '40': ('E15804001', 'FEED PAWL'), '87': ('JRP030P16', 'BALL PIN'), '41': ('F16503301', 'RETAIN RUBBER'), '52': ('JHS0622BFT', 'HEX.SOC.HD.BOLT'), '53': ('H15805301', 'STEPPED PIN'), '82A3': ('F16508202A3', 'SWITCH ASM.'), '45A': ('E15804501A', 'DOOR ASM.'), '47': ('E15804701', 'CHECK PAWL'), '46': ('G16505101', 'SPRING'), '45': ('E15804501', 'DOOR'), '48': ('H15804801', 'STEPPED PIN'), '51': ('E15805101', 'DOOR LOCK'), '50': ('G15805001', 'SPRING'), '49': ('JRP030P12', 'ROLLED PIN'), '86A1': ('F15708602A1', 'TRIGGER ASSEMBLY'), '65': ('D15806501', 'TRIP GUIDE'), '67': ('D15806701', 'SAFETY LEVER'), '66': ('G17509101', 'SPRING'), '56': ('F15805601', 'NOSE COVER'), '64': ('F15806402', 'DUST COVER'), '63': ('F16506301', 'RUBBER INSERT'), '57': ('F15805701', 'MAGAZINE'), '60': ('JLN0600E', 'LOCK NUT'), '88': ('JHS0625BFH', 'HEX.SOC.HD.BOLT'), '59': ('JHS0635BFH', 'HEX.SOC.HD.BOLT'), '61': ('JRP040P40', 'ROLLED PIN'), '62': ('JFW061210', 'FLAT WASHER'), '89': ('JUS0606BF', 'UM.HD.BOLT'), '58': ('F15805801', 'MAGAZINE COVER'), '103a1': ('f15810301a1', 'nail adj.support'), '117': ('h16511201', 'metal pad'), '68': ('jrp030p20', 'rolled pin'), '69a': ('f15806901a', 'nail support'), '70': ('g16505401', 'spring'), '71': ('h16505501', 'set shaft'), '72a': ('f15807201a', 'slide rod')}
@@ -103,67 +119,67 @@ ListA = ['MAX', 'TECH', 'OMER', 'BEA', 'BOSTITCH', 'SENCO', 'SPOTNAILS']
 ListB = []
 
 
-shipToLabel = Label(root, text="Where to ship?", bg="#e7a6a6")
+shipToLabel = Label(my_frame1, text="Where to ship?", bg="#e7a6a6")
 shipToLabel.grid(row=0, column=0)
 
 shipTo = StringVar()
-shipToEntry = ttk.Entry(root, textvariable=shipTo)
+shipToEntry = ttk.Entry(my_frame1, textvariable=shipTo)
 
 shipToEntry.grid(row=0, column=1)
 
 
-billToLabel = Label(root, text="Customer to bill?", bg="#e7a6a6")
+billToLabel = Label(my_frame1, text="Customer to bill?", bg="#e7a6a6")
 billToLabel.grid(row=0, column=3)
 
 billTo = StringVar()
-billToEntry = ttk.Entry(root, textvariable=billTo)
+billToEntry = ttk.Entry(my_frame1, textvariable=billTo)
 billToEntry.grid(row=0, column=4)
 
 
-brandLabel = Label(root, text="Tool Brand?", bg="#e7a6a6")
+brandLabel = Label(my_frame1, text="Tool Brand?", bg="#e7a6a6")
 brandLabel.grid(row=1, column=0)
 
 brand = StringVar()
-comboboxA = ttk.Combobox(root, textvariable=brand, values=ListA)
+comboboxA = ttk.Combobox(my_frame1, textvariable=brand, values=ListA)
 comboboxA.bind("<<ComboboxSelected>>", modelList)
 comboboxA.grid(row=1, column=1)
 
 
-modelLabel = Label(root, text="Tool model?", bg="#e7a6a6")
+modelLabel = Label(my_frame1, text="Tool model?", bg="#e7a6a6")
 modelLabel.grid(row=1, column=3)
 
 model = StringVar()
-comboboxB = ttk.Combobox(root, textvariable=model, values=ListB)
+comboboxB = ttk.Combobox(my_frame1, textvariable=model, values=ListB)
 comboboxB.grid(row=1, column=4)
 
 
-schemLabel = Label(root, text="Shematic Number?", bg="#a9eca7")
+schemLabel = Label(my_frame1, text="Shematic Number?", bg="#a9eca7")
 schemLabel.grid(row=5, column=3)
 
-blank1Label = Label(root, text=" ")
+blank1Label = Label(my_frame1, text=" ")
 blank1Label.grid(row=2, column=3)
 
-findLabel = Label(root, text="Pull from data Base", bg="#a9eca7")
+findLabel = Label(my_frame1, text="Pull From Database", bg="#a9eca7")
 findLabel.grid(row=3, column=3)
 
 schemNum = StringVar()
-schemEntry = Entry(root, textvariable=schemNum)
+schemEntry = Entry(my_frame1, textvariable=schemNum)
 schemEntry.grid(row=5, column=4)
 
 finalPartsList = [["TOOL", "QUANTITY", "PART#", "DESCRIPTION"]]
 
 
-ammountLabel = Label(root, text="Enter Quantitiy", bg="#e7a6a6")
+ammountLabel = Label(my_frame1, text="Enter Quantitiy", bg="#e7a6a6")
 ammountLabel.grid(row=5, column=0)
 
 amountTo = StringVar()
-amountToEntry = ttk.Entry(root, textvariable=amountTo)
+amountToEntry = ttk.Entry(my_frame1, textvariable=amountTo)
 amountToEntry.grid(row=5, column=1)
 
-blankLabel = Label(root, text=" ")
+blankLabel = Label(my_frame1, text=" ")
 blankLabel.grid(row=6, column=0)
 
-customLabel = Label(root, text="Add Custom Part Entry", bg="#a7acec")
+customLabel = Label(my_frame1, text="Add Custom Part Entry", bg="#a7acec")
 customLabel.grid(row=7, column=0)
 
 
@@ -178,7 +194,7 @@ def selectClick():
     for x in temp:
         list1.append(x)
     finalPartsList.append(list1)
-    w = ttk.Combobox(root, values=finalPartsList, width=120)
+    w = ttk.Combobox(my_frame1, values=finalPartsList, width=120)
     w.grid(row=12, column=0, columnspan=7)
     counter = counter + 1
     x = counter
@@ -187,16 +203,16 @@ def selectClick():
 
 
 schemButton = Button(
-    root, text="  Add Part  ", command=selectClick)
+    my_frame1, text="  Add Part  ", command=selectClick)
 schemButton.grid(row=5, column=6, columnspan=2)
 
-tableLabel = Label(root, text=" ")
+tableLabel = Label(my_frame1, text=" ")
 tableLabel.grid(row=10, column=0, columnspan=7)
 
-tableLabel = Label(root, text="Current Parts List")
+tableLabel = Label(my_frame1, text="Current Parts List")
 tableLabel.grid(row=11, column=0)
 
-w = ttk.Combobox(root, values=finalPartsList, width=120)
+w = ttk.Combobox(my_frame1, values=finalPartsList, width=120)
 w.grid(row=12, column=0, columnspan=7)
 w.current(counter)
 
@@ -207,7 +223,7 @@ def delLast():
         return 0
     else:
         del finalPartsList[-1]
-        w = ttk.Combobox(root, values=finalPartsList, width=120)
+        w = ttk.Combobox(my_frame1, values=finalPartsList, width=120)
         w.grid(row=12, column=0, columnspan=7)
         counter = counter - 1
         x = counter
@@ -215,22 +231,22 @@ def delLast():
 
 
 delButton = Button(
-    root, text="  Delete Last Entry  ", command=delLast)
+    my_frame1, text="  Delete Last Entry  ", command=delLast)
 delButton.grid(row=13, column=0, columnspan=4)
 
 
-partNumLabel = Label(root, text="Part #", bg="#a7acec")
+partNumLabel = Label(my_frame1, text="Part #", bg="#a7acec")
 partNumLabel.grid(row=8, column=1)
 
 custPartNum = StringVar()
-partNumEntry = Entry(root, textvariable=custPartNum)
+partNumEntry = Entry(my_frame1, textvariable=custPartNum)
 partNumEntry.grid(row=9, column=1)
 
-desLabel = Label(root, text="Part Description", bg="#a7acec")
+desLabel = Label(my_frame1, text="Part Description", bg="#a7acec")
 desLabel.grid(row=8, column=2)
 
 custDes = StringVar()
-desEntry = Entry(root, textvariable=custDes, width=50)
+desEntry = Entry(my_frame1, textvariable=custDes, width=50)
 desEntry.grid(row=9, column=2, columnspan=4)
 
 
@@ -243,7 +259,7 @@ def addCus():
     list1.append(custPartNum.get().upper())
     list1.append(custDes.get().upper())
     finalPartsList.append(list1)
-    w = ttk.Combobox(root, values=finalPartsList, width=120)
+    w = ttk.Combobox(my_frame1, values=finalPartsList, width=120)
     w.grid(row=12, column=0, columnspan=7)
     counter = counter + 1
     x = counter
@@ -252,7 +268,7 @@ def addCus():
 
 
 addCusButton = Button(
-    root, text="Add Custom Entry", command=addCus)
+    my_frame1, text="Add Custom Entry", command=addCus)
 addCusButton.grid(row=9, column=6)
 
 
@@ -264,7 +280,7 @@ def schemFetch():
 
 
 schemButton = Button(
-    root, text="Show Schematic", command=schemFetch)
+    my_frame1, text="Show Schematic", command=schemFetch)
 schemButton.grid(row=1, column=6)
 
 
@@ -352,11 +368,11 @@ def mainClick():
 
 
 button = Button(
-    root, text="                CREATE PDF              ", command=mainClick)
+    my_frame1, text="                CREATE PDF              ", command=mainClick)
 button.grid(row=13, column=5, columnspan=2)
 
 
-blankLabe2 = Label(root, text=" ")
+blankLabe2 = Label(my_frame1, text=" ")
 blankLabe2.grid(row=14, column=7)
 
 root.mainloop()
