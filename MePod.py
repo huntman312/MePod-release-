@@ -29,8 +29,8 @@ def date_of_order():
 # tkinter window
 root = Tk()
 
-root.title("MePod v1.30")
-root.iconbitmap(path + '/EXE builder/icon.ico')
+root.title("MePod v1.35")
+root.iconbitmap(str(path + '/EXE builder/icon.ico'))
 
 root.geometry("800x350")
 
@@ -51,9 +51,9 @@ my_notbook.add(my_frame2, text="Add To Database")
 
 def toolDataBase():
     b = brand.get()
-    m = re.sub('[/!@#$.]', '', model.get())
+    m = re.sub('[/]', '@', model.get())
     filePath = path + "/" + "TOOL_DATABASE" + \
-        "/" + b + "/" + m + ".txt"
+        "/" + b + "/" + m
     finalPath = str(filePath)
 
     with open(finalPath, "r") as toolTextFile:
@@ -64,28 +64,97 @@ def toolDataBase():
 
 def modelList(*args):
     sel = brand.get()
-    if sel == 'MAX':
-        ListB = ['CN55', 'CN70', 'CN70PAL', 'CN80', 'CN100', 'CN445R3',
-                 'CN550S', 'CN565D', 'CN890F2', 'SN890CH3/34', 'TA551B/16-11']
-    elif sel == 'TECH':
-        ListB = ['PCN55M.1', 'PCN670SA.1']
-    elif sel == 'OMER':
-        ListB = ['B14.763 BF']
-    elif sel == 'BEA':
-        ListB = ['W15-358C']
-    elif sel == 'BOSTITCH':
-        ListB = ['438S2R-1']
-    elif sel == 'SENCO':
-        ListB = ['SCN65XP', 'SLP20XP']
-    elif sel == 'SPOTNAILS':
-        ListB = ['RC1016']
+    List1 = os.listdir(path + "/TOOL_DATABASE/" + sel)
+    List2 = []
+    for x in List1:
+        a = x.replace("@", "/")
+        List2.append(a)
+
+    ListB = List2
     comboboxB.config(values=ListB)
 
 
-ListA = ['MAX', 'TECH', 'OMER', 'BEA', 'BOSTITCH', 'SENCO', 'SPOTNAILS']
+ListA = os.listdir(str(path + "/" + "TOOL_DATABASE"))
 ListB = []
 
 
+# add to database button setup
+
+def dataAdd():
+    dbrand = addbrand.get().upper()
+    dmodel = addmodel.get().upper()
+    key = addschemNum.get().upper()
+    dpart = addPartNum.get().upper()
+    ddesc = adddesentry.get().upper()
+    dir1 = dbrand
+    check = dmodel.replace('/', '@')
+    if not os.path.exists(path + "/" + "TOOL_DATABASE" + "/" + dir1):
+        os.mkdir(path + "/" + "TOOL_DATABASE" + "/" + dir1)
+        file1 = os.path.join(path + "/" + "TOOL_DATABASE" +
+                             "/" + dir1, check)
+    else:
+        file1 = os.path.join(path + "/" + "TOOL_DATABASE" +
+                             "/" + dir1, check)
+    finalPath = file1
+    if os.path.isfile(finalPath) == False:
+        toolFile = open(finalPath, "w")
+        toolDict = {}
+        toolDict[key] = dpart, ddesc
+        toolFile.write(str(toolDict))
+    else:
+        toolFile = open(finalPath, "r")
+        oldDict = toolFile.read()
+        newDict = {}
+        newDict[key] = dpart, ddesc
+        strToDict = literal_eval(oldDict)
+        finalDict = {**strToDict, **newDict}
+        toolFile = open(finalPath, "w")
+        toolFile.write(str(finalDict))
+
+
+brandLabel2 = Label(my_frame2, text="Tool Brand?")
+brandLabel2.grid(row=0, column=0)
+
+addbrand = StringVar()
+modelentryA2 = ttk.Entry(my_frame2, textvariable=addbrand)
+modelentryA2.grid(row=0, column=1)
+
+
+modelLabel2 = Label(my_frame2, text="Tool model?")
+modelLabel2.grid(row=0, column=3)
+
+addmodel = StringVar()
+modelentryB2 = ttk.Entry(my_frame2, textvariable=addmodel)
+modelentryB2.grid(row=0, column=4)
+
+schemLabel = Label(my_frame2, text="Shematic Number?")
+schemLabel.grid(row=1, column=0)
+
+addschemNum = StringVar()
+schemEntry2 = Entry(my_frame2, textvariable=addschemNum)
+schemEntry2.grid(row=1, column=1)
+
+addPart = Label(my_frame2, text="Part Number?")
+addPart.grid(row=1, column=3)
+
+addPartNum = StringVar()
+PartNum2 = Entry(my_frame2, textvariable=addPartNum)
+PartNum2.grid(row=1, column=4)
+
+adddesc = Label(my_frame2, text="Description?")
+adddesc.grid(row=2, column=0)
+
+adddesentry = StringVar()
+adddes2 = Entry(my_frame2, textvariable=adddesentry, width=55)
+adddes2.grid(row=2, column=1, columnspan=4)
+
+
+addButton = Button(
+    my_frame2, text="  Add To Database  ", command=dataAdd)
+addButton.grid(row=2, column=6, columnspan=2)
+
+
+# order tab
 shipToLabel = Label(my_frame1, text="Where to ship?", bg="#e7a6a6")
 shipToLabel.grid(row=0, column=0)
 
@@ -120,13 +189,13 @@ comboboxB = ttk.Combobox(my_frame1, textvariable=model, values=ListB)
 comboboxB.grid(row=1, column=4)
 
 
-schemLabel = Label(my_frame1, text="Shematic Number?", bg="#a9eca7")
+schemLabel = Label(my_frame1, text="Shematic Number?", bg="#e7a6a6")
 schemLabel.grid(row=5, column=3)
 
 blank1Label = Label(my_frame1, text=" ")
 blank1Label.grid(row=2, column=3)
 
-findLabel = Label(my_frame1, text="Pull From Database", bg="#a9eca7")
+findLabel = Label(my_frame1, text="Pull From Database", bg="#e7a6a6")
 findLabel.grid(row=3, column=3)
 
 schemNum = StringVar()
@@ -168,6 +237,9 @@ def selectClick():
     w.current(x)
     return 0
 
+
+warn1 = Label(my_frame1, text="All RED fields required!")
+warn1.grid(row=4, column=6)
 
 schemButton = Button(
     my_frame1, text="  Add Part  ", command=selectClick)
@@ -217,9 +289,41 @@ desEntry = Entry(my_frame1, textvariable=custDes, width=50)
 desEntry.grid(row=9, column=2, columnspan=4)
 
 
+def dataAddcus():
+    dbrand = brand.get().upper()
+    dmodel = model.get().upper()
+    key = schemNum.get().upper()
+    dpart = custPartNum.get().upper()
+    ddesc = custDes.get().upper()
+    dir1 = dbrand
+    check = dmodel.replace('/', '@')
+    if not os.path.exists(path + "/" + "TOOL_DATABASE" + "/" + dir1):
+        os.mkdir(path + "/" + "TOOL_DATABASE" + "/" + dir1)
+        file1 = os.path.join(path + "/" + "TOOL_DATABASE" +
+                             "/" + dir1, check)
+    else:
+        file1 = os.path.join(path + "/" + "TOOL_DATABASE" +
+                             "/" + dir1, check)
+    finalPath = file1
+    if os.path.isfile(finalPath) == False:
+        toolFile = open(finalPath, "w")
+        toolDict = {}
+        toolDict[key] = dpart, ddesc
+        toolFile.write(str(toolDict))
+    else:
+        toolFile = open(finalPath, "r")
+        oldDict = toolFile.read()
+        newDict = {}
+        newDict[key] = dpart, ddesc
+        strToDict = literal_eval(oldDict)
+        finalDict = {**strToDict, **newDict}
+        toolFile = open(finalPath, "w")
+        toolFile.write(str(finalDict))
+
+
 def addCus():
     global counter
-    partList = toolDataBase()
+    #partList = toolDataBase()
     list1 = []
     list1.append(brand.get().upper() + " " + model.get().upper())
     list1.append(amountTo.get())
@@ -231,8 +335,12 @@ def addCus():
     counter = counter + 1
     x = counter
     w.current(x)
+    dataAddcus()
     return 0
 
+
+warn2 = Label(my_frame1, text="All RED and BLUE fields required!")
+warn2.grid(row=8, column=6)
 
 addCusButton = Button(
     my_frame1, text="Add Custom Entry", command=addCus)
