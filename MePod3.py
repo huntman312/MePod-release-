@@ -6,6 +6,7 @@ import os
 from ast import literal_eval
 from typing_extensions import IntVar
 from reportlab.platypus import SimpleDocTemplate
+from reportlab.platypus.paragraph import textTransformFrags
 # from reportlab.platypus.paraparser import check_text
 from reportlab.platypus.tables import Table
 import datetime
@@ -301,6 +302,45 @@ class Toplevel1:
             d = datetime.datetime.today()
             return str(d.month) + "-" + str(d.day) + "-" + str(d.year)
 
+
+        def saveToMaster(customer1, data):
+            customer = customer1.lstrip()
+            for x in data:
+                key = x[2]
+                tool = x[0]
+                desc = x[3]
+                quant = x[1]
+                filePath = os.path.join(path + "/" + "CONFIGS", customer)
+                if key != "PART#":
+                    if os.path.isfile(filePath) == False:
+                        toolFile = open(filePath, "w")
+                        toolDict = {}
+                        toolDict[key] = tool, quant, desc
+                        toolFile.write(str(toolDict))
+                    else:
+                        toolFile = open(filePath, "r")
+                        oldDict = toolFile.read()
+                        strToDict = literal_eval(oldDict)
+                        if key in strToDict:
+                            list1 = list(strToDict[key])
+                            print(list1)
+                            newQuant = int(quant) + int(list1[1])
+                            newDict = {}
+                            newDict[key] = tool, newQuant, desc
+                            strToDict = literal_eval(oldDict)
+                            finalDict = {**strToDict, **newDict}
+                            toolFile = open(filePath, "w")
+                            toolFile.write(str(finalDict))
+                        else:  
+                            newDict = {}
+                            newDict[key] = tool, quant, desc
+                            strToDict = literal_eval(oldDict)
+                            finalDict = {**strToDict, **newDict}
+                            toolFile = open(filePath, "w")
+                            toolFile.write(str(finalDict))
+
+
+
         def pdfMaker():
             # stuffx = a
             # print(type(stuffx))
@@ -311,6 +351,9 @@ class Toplevel1:
             info = [["BILL: ", customer], [
                 "SHIP: ", shipTo], ["DATE: ", dateOfOrder]]
             data = finalPartsList
+
+            saveToMaster(customer, data)
+
 
             save_path = path + "/orders to be sent/" + pdfName
 
@@ -742,9 +785,16 @@ class Toplevel1:
         self.PNotebook1_t3.configure(background="#d9d9d9")
         self.PNotebook1_t3.configure(highlightbackground="#d9d9d9")
         self.PNotebook1_t3.configure(highlightcolor="black")
+        self.PNotebook1_t5 = tk.Frame(self.PNotebook1)
+        self.PNotebook1.add(self.PNotebook1_t5, padding=3)
+        self.PNotebook1.tab(3, text="Back Order",
+                            compound="none", underline="-1",)
+        self.PNotebook1_t5.configure(background="#d9d9d9")
+        self.PNotebook1_t5.configure(highlightbackground="#d9d9d9")
+        self.PNotebook1_t5.configure(highlightcolor="black")
         self.PNotebook1_t4 = tk.Frame(self.PNotebook1)
         self.PNotebook1.add(self.PNotebook1_t4, padding=3)
-        self.PNotebook1.tab(3, text="Settings",
+        self.PNotebook1.tab(4, text="Settings",
                             compound="none", underline="-1",)
         self.PNotebook1_t4.configure(background="#d9d9d9")
         self.PNotebook1_t4.configure(highlightbackground="#d9d9d9")
@@ -1404,6 +1454,103 @@ class Toplevel1:
         self.DBRefreshButton.place(relx=0.821, rely=0.045, height=35, width=86)
         self.DBRefreshButton.configure(takefocus="")
         self.DBRefreshButton.configure(text='''Refresh''')
+
+        self.BOCombobox1 = ttk.Combobox(self.PNotebook1_t5)
+        self.BOCombobox1.place(relx=0.0, rely=0.063,
+                               relheight=0.044, relwidth=0.398)
+        self.BOCombobox1.configure(takefocus="")
+
+        self.BOLabel1 = tk.Label(self.PNotebook1_t5)
+        self.BOLabel1.place(relx=0.0, rely=0.021, height=11, width=64)
+        self.BOLabel1.configure(background="#d9d9d9")
+        self.BOLabel1.configure(disabledforeground="#a3a3a3")
+        self.BOLabel1.configure(foreground="#000000")
+        self.BOLabel1.configure(text='''Customer:''')
+
+        self.TNotebook2 = ttk.Notebook(self.PNotebook1_t5)
+        self.TNotebook2.place(relx=0.0, rely=0.127,
+                              relheight=0.879, relwidth=1.007)
+        self.TNotebook2.configure(takefocus="")
+        self.TNotebook2_t2 = tk.Frame(self.TNotebook2)
+        self.TNotebook2.add(self.TNotebook2_t2, padding=3)
+        self.TNotebook2.tab(0, text="List", compound="left", underline="-1",)
+        self.TNotebook2_t2.configure(background="#d9d9d9")
+        self.TNotebook2_t2.configure(highlightbackground="#d9d9d9")
+        self.TNotebook2_t2.configure(highlightcolor="black")
+        self.TNotebook2_t1 = tk.Frame(self.TNotebook2)
+        self.TNotebook2.add(self.TNotebook2_t1, padding=3)
+        self.TNotebook2.tab(1, text="Edit", compound="left", underline="-1",)
+        self.TNotebook2_t1.configure(background="#d9d9d9")
+        self.TNotebook2_t1.configure(highlightbackground="#d9d9d9")
+        self.TNotebook2_t1.configure(highlightcolor="black")
+
+        self.BOScrolledlistbox = ScrolledListBox(self.TNotebook2_t2)
+        self.BOScrolledlistbox.place(
+            relx=0.0, rely=0.026, relheight=0.962, relwidth=1.002)
+        self.BOScrolledlistbox.configure(background="white")
+        self.BOScrolledlistbox.configure(cursor="xterm")
+        self.BOScrolledlistbox.configure(disabledforeground="#a3a3a3")
+        self.BOScrolledlistbox.configure(font="TkFixedFont")
+        self.BOScrolledlistbox.configure(foreground="black")
+        self.BOScrolledlistbox.configure(highlightbackground="#d9d9d9")
+        self.BOScrolledlistbox.configure(highlightcolor="#d9d9d9")
+        self.BOScrolledlistbox.configure(selectbackground="blue")
+        self.BOScrolledlistbox.configure(selectforeground="white")
+
+        self.BOMessage = tk.Message(self.TNotebook2_t1)
+        self.BOMessage.place(relx=0.018, rely=0.103,
+                             relheight=0.059, relwidth=0.946)
+        self.BOMessage.configure(background="#d9d9d9")
+        self.BOMessage.configure(foreground="#000000")
+        self.BOMessage.configure(highlightbackground="#d9d9d9")
+        self.BOMessage.configure(highlightcolor="black")
+        self.BOMessage.configure(text='''Message''')
+        self.BOMessage.configure(width=530)
+
+        self.BOLabel5 = tk.Label(self.TNotebook2_t1)
+        self.BOLabel5.place(relx=0.036, rely=0.026, height=21, width=104)
+        self.BOLabel5.configure(background="#d9d9d9")
+        self.BOLabel5.configure(disabledforeground="#a3a3a3")
+        self.BOLabel5.configure(foreground="#000000")
+        self.BOLabel5.configure(text='''Selected Part:''')
+
+        self.BOQuantEntry = tk.Entry(self.TNotebook2_t1)
+        self.BOQuantEntry.place(relx=0.696, rely=0.256,
+                                height=20, relwidth=0.15)
+
+        self.BOQuantEntry.configure(background="white")
+        self.BOQuantEntry.configure(disabledforeground="#a3a3a3")
+        self.BOQuantEntry.configure(font="TkFixedFont")
+        self.BOQuantEntry.configure(foreground="#000000")
+        self.BOQuantEntry.configure(insertbackground="black")
+
+        self.BOLabel4 = tk.Label(self.TNotebook2_t1)
+        self.BOLabel4.place(relx=0.536, rely=0.256, height=21, width=84)
+        self.BOLabel4.configure(background="#d9d9d9")
+        self.BOLabel4.configure(disabledforeground="#a3a3a3")
+        self.BOLabel4.configure(foreground="#000000")
+        self.BOLabel4.configure(text='''Edit Quantity:''')
+
+        self.BOButton = tk.Button(self.TNotebook2_t1)
+        self.BOButton.place(relx=0.714, rely=0.359, height=44, width=57)
+        self.BOButton.configure(activebackground="#ececec")
+        self.BOButton.configure(activeforeground="#000000")
+        self.BOButton.configure(background="#d9d9d9")
+        self.BOButton.configure(disabledforeground="#a3a3a3")
+        self.BOButton.configure(foreground="#000000")
+        self.BOButton.configure(highlightbackground="#d9d9d9")
+        self.BOButton.configure(highlightcolor="black")
+        self.BOButton.configure(pady="0")
+        self.BOButton.configure(text='''Update''')
+
+        self.BOLabel3 = ttk.Label(self.PNotebook1_t5)
+        self.BOLabel3.place(relx=0.0, rely=0.127, height=29, width=95)
+        self.BOLabel3.configure(background="#d9d9d9")
+        self.BOLabel3.configure(foreground="#000000")
+        self.BOLabel3.configure(font="TkDefaultFont")
+        self.BOLabel3.configure(relief="flat")
+        self.BOLabel3.configure(anchor='w')
+        self.BOLabel3.configure(justify='left')
 
 # The following code is add to handle mouse events with the close icons
 # in PNotebooks widgets.
