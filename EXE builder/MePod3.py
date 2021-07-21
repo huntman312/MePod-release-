@@ -19,11 +19,12 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import BooleanVar, ttk
 from tkinter import *
-
+import pyautogui
 py3 = True
 path = os.getcwd()
 finalPartsList = [["TOOL", "QUANTITY", "PART#", "DESCRIPTION"]]
 system = sys.platform
+BOList = []
 
 
 # start support
@@ -86,6 +87,66 @@ def destroy_Toplevel1():
 class Toplevel1:
 
     def __init__(self, top=None):
+
+        def BOedSel(event):
+            self.TNotebook2.select(self.TNotebook2_t1)
+            w = event.widget
+            index = int(w.curselection()[0])
+            selected = list(self.BOScrolledlistbox.get(index))
+            self.BOMessage.configure(text=str(selected))
+            actualIndex = BOList.index(selected)
+            self.hiddenEntry.insert(END, actualIndex)
+            self.BOQuantEntry.delete(0, END)
+
+        def BOupdateB(*args):
+            BOupdate()
+
+        def BOupdate():
+            getBO(1)
+            item = list(self.BOScrolledlistbox.get(
+                int(self.hiddenEntry.get())))
+            oldcount = item.pop(2)
+            newcount = int(oldcount) - int(self.BOQuantEntry.get())
+            if newcount <= 0:
+                self.BOScrolledlistbox.delete(int(self.hiddenEntry.get()))
+                BOList.pop(int(self.hiddenEntry.get()))
+            else:
+                item.insert(2, str(newcount))
+                self.BOScrolledlistbox.delete(int(self.hiddenEntry.get()))
+                BOList.pop(int(self.hiddenEntry.get()))
+                self.BOScrolledlistbox.insert(
+                    int(self.hiddenEntry.get()), item)
+                BOList.insert(int(self.hiddenEntry.get()), item)
+            self.hiddenEntry.delete(0, END)
+            dict1 = {}
+            for x in self.BOScrolledlistbox.get(0, END):
+                dict1[x[0]] = x[1], x[2], x[3], x[4]
+            os.remove(path + "/" + "DAT" + "/" + self.BOCombobox1.get())
+            finalPath = os.path.join(
+                path + "/" + "DAT", self.BOCombobox1.get())
+            toolFile = open(finalPath, "w")
+            toolFile.write(str(dict1))
+
+        def getBO(event):
+            self.BOEntry1.delete(0, END)
+            BOList.clear()
+            self.TNotebook2.select(self.TNotebook2_t2)
+            self.BOScrolledlistbox.delete(0, END)
+            cust = self.BOCombobox1.get()
+            filePath = path + "/" + "DAT" + "/" + cust
+            finalPath = str(filePath)
+
+            with open(finalPath, "r") as toolTextFile:
+                toolDict = toolTextFile.read()
+                dict = literal_eval(toolDict)
+            for i in (dict):
+                values = list(dict[i])
+                values.insert(0, i)
+                self.BOScrolledlistbox.insert(END, values)
+                BOList.append(values)
+
+        def BOCustomerGet():
+            return(os.listdir(str(path + "/" + "DAT")))
 
         def shipList():
             setFilePath = path + "/" + "settings.txt"
@@ -273,10 +334,10 @@ class Toplevel1:
             addCus()
 
         def addCus():
-            shemNum = self.cusSchemNum.get()
-            partNum = self.cusPartNum.get()
-            des = self.cusDescription.get()
-            tool = self.brandCombobox.get() + " " + self.modelCombobox.get()
+            shemNum = self.cusSchemNum.get().upper()
+            partNum = self.cusPartNum.get().upper()
+            des = self.cusDescription.get().upper()
+            tool = self.brandCombobox.get().upper() + " " + self.modelCombobox.get().upper()
             found = False
             for x in finalPartsList:
                 if partNum == x[2]:
@@ -302,20 +363,19 @@ class Toplevel1:
             d = datetime.datetime.today()
             return str(d.month) + "-" + str(d.day) + "-" + str(d.year)
 
-
-        def saveToMaster(customer1, data):
+        def saveToMaster(customer1, data, date):
             customer = customer1.lstrip()
             for x in data:
                 key = x[2]
                 tool = x[0]
                 desc = x[3]
                 quant = x[1]
-                filePath = os.path.join(path + "/" + "CONFIGS", customer)
+                filePath = os.path.join(path + "/" + "DAT", customer)
                 if key != "PART#":
                     if os.path.isfile(filePath) == False:
                         toolFile = open(filePath, "w")
                         toolDict = {}
-                        toolDict[key] = tool, quant, desc
+                        toolDict[key] = tool, quant, desc, date
                         toolFile.write(str(toolDict))
                     else:
                         toolFile = open(filePath, "r")
@@ -323,23 +383,20 @@ class Toplevel1:
                         strToDict = literal_eval(oldDict)
                         if key in strToDict:
                             list1 = list(strToDict[key])
-                            print(list1)
                             newQuant = int(quant) + int(list1[1])
                             newDict = {}
-                            newDict[key] = tool, newQuant, desc
+                            newDict[key] = tool, newQuant, desc, date
                             strToDict = literal_eval(oldDict)
                             finalDict = {**strToDict, **newDict}
                             toolFile = open(filePath, "w")
                             toolFile.write(str(finalDict))
-                        else:  
+                        else:
                             newDict = {}
-                            newDict[key] = tool, quant, desc
+                            newDict[key] = tool, quant, desc, date
                             strToDict = literal_eval(oldDict)
                             finalDict = {**strToDict, **newDict}
                             toolFile = open(filePath, "w")
                             toolFile.write(str(finalDict))
-
-
 
         def pdfMaker():
             # stuffx = a
@@ -352,8 +409,7 @@ class Toplevel1:
                 "SHIP: ", shipTo], ["DATE: ", dateOfOrder]]
             data = finalPartsList
 
-            saveToMaster(customer, data)
-
+            saveToMaster(customer, data, dateOfOrder)
 
             save_path = path + "/orders to be sent/" + pdfName
 
@@ -628,6 +684,26 @@ class Toplevel1:
                     for i in res:
                         self.availablePartsListBox.insert(END, i)
 
+        def callback1(var):
+            check = self.BOEntry1.get().upper()
+            list1 = []
+            for x in self.BOScrolledlistbox.get(0, END):
+                list1.append(x)
+            if check == '':
+                getBO(1)
+
+            else:
+                res = []
+                for x in list1:
+                    test1 = x[0]
+                    test2 = x[1]
+                    test3 = x[4]
+                    if test1.startswith(check) or test2.startswith(check) or test3.startswith(check):
+                        res.append(x)
+                self.BOScrolledlistbox.delete(0, END)
+                for x in res:
+                    self.BOScrolledlistbox.insert(END, x)
+
         def schemFetch():
             modelFix = re.sub('[/!@#$.]', '', self.modelCombobox.get())
             filename = os.getcwd() + '/Schematics/' + \
@@ -673,11 +749,14 @@ class Toplevel1:
                 values.insert(0, i)
                 self.DBScrolledlistbox.insert(END, values)
 
+        def doclick(*args):
+            pyautogui.tripleClick()
+
         def doPopUp(event):
             try:
-                m.tk_popup(event.x_root, event.y_root)
+                m1.tk_popup(event.x_root, event.y_root)
             finally:
-                m.grab_release()
+                m1.grab_release()
 
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
@@ -752,9 +831,9 @@ class Toplevel1:
                                                                 "left", "sticky": ''}),
                                     ("ClosetabNotebook.close", {"side":
                                                                 "left", "sticky": ''}), ]})]})]})])
-        m = Menu(root, tearoff=0)
-        m.add_command(label="Edit", command=edSel)
-        m.add_command(label="Delete", command=deleteFromList)
+        m1 = Menu(root, tearoff=0)
+        m1.add_command(label="Edit", command=edSel)
+        m1.add_command(label="Delete", command=deleteFromList)
 
         PNOTEBOOK = "ClosetabNotebook"
 
@@ -819,9 +898,10 @@ class Toplevel1:
         self.finalListbox.configure(highlightcolor="#d9d9d9")
         self.finalListbox.configure(selectbackground="blue")
         self.finalListbox.configure(selectforeground="white")
-        self.finalListbox.bind('<Double-1>', doPopUp)
+        self.finalListbox.bind('<3>', doclick)
         self.finalListbox.bind('<Delete>', deleteFromList)
         self.finalListbox.bind('<Return>', editSelection)
+        self.finalListbox.bind('<Triple-1>', doPopUp)
 
         for values in (finalPartsList):
             self.finalListbox.insert(END, values)
@@ -1456,15 +1536,21 @@ class Toplevel1:
         self.DBRefreshButton.configure(text='''Refresh''')
 
         self.BOCombobox1 = ttk.Combobox(self.PNotebook1_t5)
-        self.BOCombobox1.place(relx=0.0, rely=0.063,
+        self.BOCombobox1.place(relx=0.589, rely=0.063,
                                relheight=0.044, relwidth=0.398)
+        self.BOCombobox1.configure(values=BOCustomerGet())
         self.BOCombobox1.configure(takefocus="")
+        self.BOCombobox1.bind("<<ComboboxSelected>>", getBO)
 
         self.BOLabel1 = tk.Label(self.PNotebook1_t5)
-        self.BOLabel1.place(relx=0.0, rely=0.021, height=11, width=64)
+        self.BOLabel1.place(relx=0.589, rely=0.021, height=11, width=64)
+        self.BOLabel1.configure(activebackground="#f9f9f9")
+        self.BOLabel1.configure(activeforeground="black")
         self.BOLabel1.configure(background="#d9d9d9")
         self.BOLabel1.configure(disabledforeground="#a3a3a3")
         self.BOLabel1.configure(foreground="#000000")
+        self.BOLabel1.configure(highlightbackground="#d9d9d9")
+        self.BOLabel1.configure(highlightcolor="black")
         self.BOLabel1.configure(text='''Customer:''')
 
         self.TNotebook2 = ttk.Notebook(self.PNotebook1_t5)
@@ -1488,7 +1574,7 @@ class Toplevel1:
         self.BOScrolledlistbox.place(
             relx=0.0, rely=0.026, relheight=0.962, relwidth=1.002)
         self.BOScrolledlistbox.configure(background="white")
-        self.BOScrolledlistbox.configure(cursor="xterm")
+        self.BOScrolledlistbox.configure(cursor="hand2")
         self.BOScrolledlistbox.configure(disabledforeground="#a3a3a3")
         self.BOScrolledlistbox.configure(font="TkFixedFont")
         self.BOScrolledlistbox.configure(foreground="black")
@@ -1496,43 +1582,65 @@ class Toplevel1:
         self.BOScrolledlistbox.configure(highlightcolor="#d9d9d9")
         self.BOScrolledlistbox.configure(selectbackground="blue")
         self.BOScrolledlistbox.configure(selectforeground="white")
+        self.BOScrolledlistbox.bind('<Double-1>', BOedSel)
 
         self.BOMessage = tk.Message(self.TNotebook2_t1)
-        self.BOMessage.place(relx=0.018, rely=0.103,
-                             relheight=0.059, relwidth=0.946)
+        self.BOMessage.place(relx=0.018, rely=0.308,
+                             relheight=0.059, relwidth=0.964)
         self.BOMessage.configure(background="#d9d9d9")
         self.BOMessage.configure(foreground="#000000")
         self.BOMessage.configure(highlightbackground="#d9d9d9")
         self.BOMessage.configure(highlightcolor="black")
-        self.BOMessage.configure(text='''Message''')
-        self.BOMessage.configure(width=530)
+        self.BOMessage.configure(width=540)
 
         self.BOLabel5 = tk.Label(self.TNotebook2_t1)
-        self.BOLabel5.place(relx=0.036, rely=0.026, height=21, width=104)
+        self.BOLabel5.place(relx=0.0, rely=0.0, height=1, width=1)
+        self.BOLabel5.configure(activebackground="#f9f9f9")
+        self.BOLabel5.configure(activeforeground="black")
         self.BOLabel5.configure(background="#d9d9d9")
         self.BOLabel5.configure(disabledforeground="#a3a3a3")
         self.BOLabel5.configure(foreground="#000000")
+        self.BOLabel5.configure(highlightbackground="#d9d9d9")
+        self.BOLabel5.configure(highlightcolor="black")
         self.BOLabel5.configure(text='''Selected Part:''')
 
         self.BOQuantEntry = tk.Entry(self.TNotebook2_t1)
-        self.BOQuantEntry.place(relx=0.696, rely=0.256,
+        self.BOQuantEntry.place(relx=0.714, rely=0.385,
                                 height=20, relwidth=0.15)
-
         self.BOQuantEntry.configure(background="white")
         self.BOQuantEntry.configure(disabledforeground="#a3a3a3")
         self.BOQuantEntry.configure(font="TkFixedFont")
         self.BOQuantEntry.configure(foreground="#000000")
+        self.BOQuantEntry.configure(highlightbackground="#d9d9d9")
+        self.BOQuantEntry.configure(highlightcolor="black")
         self.BOQuantEntry.configure(insertbackground="black")
+        self.BOQuantEntry.configure(selectbackground="blue")
+        self.BOQuantEntry.configure(selectforeground="white")
+        self.BOQuantEntry.bind("<Return>", BOupdateB)
 
         self.BOLabel4 = tk.Label(self.TNotebook2_t1)
-        self.BOLabel4.place(relx=0.536, rely=0.256, height=21, width=84)
+        self.BOLabel4.place(relx=0.464, rely=0.385, height=21, width=134)
+        self.BOLabel4.configure(activebackground="#f9f9f9")
+        self.BOLabel4.configure(activeforeground="black")
         self.BOLabel4.configure(background="#d9d9d9")
         self.BOLabel4.configure(disabledforeground="#a3a3a3")
         self.BOLabel4.configure(foreground="#000000")
-        self.BOLabel4.configure(text='''Edit Quantity:''')
+        self.BOLabel4.configure(highlightbackground="#d9d9d9")
+        self.BOLabel4.configure(highlightcolor="black")
+        self.BOLabel4.configure(text='''Enter Amount Recieved:''')
+
+        self.BOLabel5 = tk.Label(self.TNotebook2_t1)
+        self.BOLabel5.place(relx=0.036, rely=0.231, height=21, width=104)
+        self.BOLabel5.configure(activebackground="#f9f9f9")
+        self.BOLabel5.configure(activeforeground="black")
+        self.BOLabel5.configure(background="#d9d9d9")
+        self.BOLabel5.configure(disabledforeground="#a3a3a3")
+        self.BOLabel5.configure(foreground="#000000")
+        self.BOLabel5.configure(highlightbackground="#d9d9d9")
+        self.BOLabel5.configure(highlightcolor="black")
 
         self.BOButton = tk.Button(self.TNotebook2_t1)
-        self.BOButton.place(relx=0.714, rely=0.359, height=44, width=57)
+        self.BOButton.place(relx=0.732, rely=0.462, height=44, width=57)
         self.BOButton.configure(activebackground="#ececec")
         self.BOButton.configure(activeforeground="#000000")
         self.BOButton.configure(background="#d9d9d9")
@@ -1542,15 +1650,42 @@ class Toplevel1:
         self.BOButton.configure(highlightcolor="black")
         self.BOButton.configure(pady="0")
         self.BOButton.configure(text='''Update''')
+        self.BOButton.configure(command=BOupdate)
 
         self.BOLabel3 = ttk.Label(self.PNotebook1_t5)
-        self.BOLabel3.place(relx=0.0, rely=0.127, height=29, width=95)
+        self.BOLabel3.place(relx=-0.036, rely=0.127, height=29, width=585)
         self.BOLabel3.configure(background="#d9d9d9")
         self.BOLabel3.configure(foreground="#000000")
-        self.BOLabel3.configure(font="TkDefaultFont")
         self.BOLabel3.configure(relief="flat")
         self.BOLabel3.configure(anchor='w')
         self.BOLabel3.configure(justify='left')
+
+        self.BOLabel2 = tk.Label(self.PNotebook1_t5)
+        self.BOLabel2.place(relx=0.0, rely=0.085, height=21, width=124)
+        self.BOLabel2.configure(activebackground="#f9f9f9")
+        self.BOLabel2.configure(activeforeground="black")
+        self.BOLabel2.configure(background="#d9d9d9")
+        self.BOLabel2.configure(disabledforeground="#a3a3a3")
+        self.BOLabel2.configure(foreground="#000000")
+        self.BOLabel2.configure(highlightbackground="#d9d9d9")
+        self.BOLabel2.configure(highlightcolor="black")
+        self.BOLabel2.configure(text='''Search Part Number:''')
+
+        var1 = tk.StringVar()
+        var1.trace("w", lambda name, index, mode, var=var1: callback1(var1))
+        self.BOEntry1 = tk.Entry(self.PNotebook1_t5)
+        self.BOEntry1.place(relx=0.018, rely=0.148, height=20, relwidth=0.221)
+        self.BOEntry1.configure(background="white")
+        self.BOEntry1.configure(disabledforeground="#a3a3a3")
+        self.BOEntry1.configure(font="TkFixedFont")
+        self.BOEntry1.configure(foreground="#000000")
+        self.BOEntry1.configure(highlightbackground="#d9d9d9")
+        self.BOEntry1.configure(highlightcolor="black")
+        self.BOEntry1.configure(insertbackground="black")
+        self.BOEntry1.configure(selectbackground="blue")
+        self.BOEntry1.configure(selectforeground="white")
+        self.BOEntry1.configure(textvariable=var1)
+
 
 # The following code is add to handle mouse events with the close icons
 # in PNotebooks widgets.
