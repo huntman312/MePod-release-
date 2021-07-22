@@ -20,11 +20,14 @@ import tkinter.ttk as ttk
 from tkinter import BooleanVar, ttk
 from tkinter import *
 import pyautogui
+import collections
 py3 = True
-path = os.getcwd()
+path = os.getcwd() + "/Dat"
 finalPartsList = [["TOOL", "QUANTITY", "PART#", "DESCRIPTION"]]
 system = sys.platform
+DBList = []
 BOList = []
+CUSTOMER_LIST = []
 
 
 # start support
@@ -87,6 +90,71 @@ def destroy_Toplevel1():
 class Toplevel1:
 
     def __init__(self, top=None):
+        setFilePath = path + "/" + "settings"
+        filePath = str(setFilePath)
+        setfile = open(filePath, "r")
+        customerList = setfile.read()
+        CUSTOMER_LIST = customerList.split(",")
+
+        def keySearch(key):
+            counter = 0
+            while counter == 0:
+                for x in customerList:
+                    if x.startswith(key):
+                        counter = + customerList.index(x)
+            print(counter)
+
+        def keyPressL(*ARGS):
+            keySearch("L")
+
+        def addCustomerToListB(*args):
+            addCustomerToList()
+
+        def addCustomerToList():
+            value = self.SetCustEntry.get().upper()
+            isThere = False
+            for x in self.SetScrolledlistbox.get(0, END):
+                if x == value:
+                    isThere = True
+            if isThere == False:
+                self.SetScrolledlistbox.insert(END, value)
+            self.SetCustEntry.delete(0, END)
+
+        def setDelCust():
+            self.SetScrolledlistbox.delete(
+                self.SetScrolledlistbox.curselection()[0])
+
+        def setSave():
+            str1 = ""
+            list1 = []
+            list2 = []
+            name = self.SetNameEntry.get().upper()
+            list1.append(name + '\'S HOUSE')
+            for x in self.SetScrolledlistbox.get(0, END):
+                list2.append(x)
+
+            list2.sort()
+            fList = list1 + list2
+            CUSTOMER_LIST = fList
+            for x in fList:
+                str1 += x
+                str1 += ","
+            finalstr = str1[:-1]
+            setFile = open(path + "/" + "settings", "w")
+            n = setFile.write(finalstr)
+            setFile.close()
+
+        def setting():
+            totalList = shipList()
+            name = str(totalList[0])
+            nameOnly = name[:-8]
+            totalList.pop(0)
+            for i in totalList:
+                self.SetScrolledlistbox.insert(END, i)
+            return nameOnly
+
+        def BOBack():
+            self.TNotebook2.select(self.TNotebook2_t2)
 
         def BOedSel(event):
             self.TNotebook2.select(self.TNotebook2_t1)
@@ -121,9 +189,9 @@ class Toplevel1:
             dict1 = {}
             for x in self.BOScrolledlistbox.get(0, END):
                 dict1[x[0]] = x[1], x[2], x[3], x[4]
-            os.remove(path + "/" + "DAT" + "/" + self.BOCombobox1.get())
+            os.remove(path + "/" + "MASTER" + "/" + self.BOCombobox1.get())
             finalPath = os.path.join(
-                path + "/" + "DAT", self.BOCombobox1.get())
+                path + "/" + "MASTER", self.BOCombobox1.get())
             toolFile = open(finalPath, "w")
             toolFile.write(str(dict1))
 
@@ -133,7 +201,7 @@ class Toplevel1:
             self.TNotebook2.select(self.TNotebook2_t2)
             self.BOScrolledlistbox.delete(0, END)
             cust = self.BOCombobox1.get()
-            filePath = path + "/" + "DAT" + "/" + cust
+            filePath = path + "/" + "MASTER" + "/" + cust
             finalPath = str(filePath)
 
             with open(finalPath, "r") as toolTextFile:
@@ -146,10 +214,10 @@ class Toplevel1:
                 BOList.append(values)
 
         def BOCustomerGet():
-            return(os.listdir(str(path + "/" + "DAT")))
+            return(os.listdir(str(path + "/" + "MASTER")))
 
         def shipList():
-            setFilePath = path + "/" + "settings.txt"
+            setFilePath = path + "/" + "settings"
             filePath = str(setFilePath)
             setfile = open(filePath, "r")
             customerList = setfile.read()
@@ -330,6 +398,21 @@ class Toplevel1:
             self.DBPartEntry.insert(END, item[1])
             self.DBDesEntry.insert(END, item[2])
 
+        def DBdeleteFromList():
+            index = self.DBScrolledlistbox.curselection()[0]
+            DBList.pop(index)
+            self.DBScrolledlistbox.delete(index)
+            brand = self.DBBrandTCombobox.get()
+            m = re.sub('[/]', '@', self.DBModelTCombobox.get())
+            finalPath = os.path.join(
+                path + "/" + "TOOL_DATABASE" + "/" + brand, m)
+            finalDict = {}
+            for x in DBList:
+                finalDict[x[0]] = x[1], x[2]
+
+            toolFile = open(finalPath, "w")
+            toolFile.write(str(finalDict))
+
         def addCusB(*args):
             addCus()
 
@@ -370,7 +453,7 @@ class Toplevel1:
                 tool = x[0]
                 desc = x[3]
                 quant = x[1]
-                filePath = os.path.join(path + "/" + "DAT", customer)
+                filePath = os.path.join(path + "/" + "MASTER", customer)
                 if key != "PART#":
                     if os.path.isfile(filePath) == False:
                         toolFile = open(filePath, "w")
@@ -467,6 +550,85 @@ class Toplevel1:
 
             pdf.build(elems)
 
+        def BOPDF():
+            # stuffx = a
+            # print(type(stuffx))
+            customer = self.BOCombobox1.get().upper()
+            dateOfOrder = date_of_order()
+            pdfName = dateOfOrder + "(" + customer + ")Parts Waiting.pdf"
+            info = [["BACK", "ORDER"], [
+                "Customer: ", customer], ["DATE: ", dateOfOrder]]
+            dataList = BOList
+            data = []
+            for i in dataList:
+                i.pop(3)
+                data.append(i)
+
+            header = ["Part Number", "Tool", "Amount Owed", "Last Ordered"]
+            data.insert(0, header)
+
+            dirPath = os.path.expanduser("~/Desktop")
+            check = os.path.exists(dirPath)
+
+            if check == False:
+                dirPath = os.path.expanduser("~/OneDrive/Desktop")
+
+            save_path = dirPath + "/" + pdfName
+
+            pdf = SimpleDocTemplate(save_path, pagesize=letter)
+
+            InFo = Table(info)
+            table = Table(data)
+
+            # add style
+
+            style = TableStyle([
+                ('BACKGROUND', (0, 0), (3, 0), colors.black),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+
+                ('FONTNAME', (0, 0), (-1, 0), 'Courier-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 14),
+
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ])
+            table.setStyle(style)
+
+            # 2) Alternate backgroud color
+            rowNumb = len(data)
+            for i in range(1, rowNumb):
+                if i % 2 == 0:
+                    bc = colors.aquamarine
+                else:
+                    bc = colors.lavender
+
+                ts = TableStyle(
+                    [('BACKGROUND', (0, i), (-1, i), bc)]
+                )
+                table.setStyle(ts)
+
+            # 3) Add borders
+            ts = TableStyle(
+                [
+                    ('BOX', (0, 0), (-1, -1), 2, colors.black),
+
+                    # ('LINEBEFORE', (4, 1), (4, -1), 2, colors.red),
+                    # ('LINEABOVE', (0, 1), (-1, 1), 2, colors.green),
+
+                    ('GRID', (0, 1), (-1, -1), 2, colors.maroon),
+                ]
+            )
+            table.setStyle(ts)
+
+            elems = []
+            elems.append(InFo)
+            elems.append(table)
+
+            pdf.build(elems)
+
         def clearAllFields():
             self.partSearchEntry.delete(0, END)
             self.modelCombobox.delete(0, END)
@@ -521,8 +683,7 @@ class Toplevel1:
 
         def deleteFromList():
             self.QEntry.delete(0, END)
-            tup = self.finalListbox.curselection()
-            index = tup[0]
+            index = self.finalListbox.curselection()[0]
             if index > 0:
                 finalPartsList.pop(index)
                 self.finalListbox.delete(index)
@@ -706,7 +867,7 @@ class Toplevel1:
 
         def schemFetch():
             modelFix = re.sub('[/!@#$.]', '', self.modelCombobox.get())
-            filename = os.getcwd() + '/Schematics/' + \
+            filename = path + '/Schematics/' + \
                 self.brandCombobox.get() + modelFix + '.pdf'
             os.startfile(filename)
             return 0
@@ -732,13 +893,21 @@ class Toplevel1:
                     values.insert(0, i)
                     self.availablePartsListBox.insert(END, values)
 
-        def DBtoolDataBase(event):
+        def DBtoolDataBaseB():
+            DBtoolDataBase(1)
 
+        def DBtoolDataBase(event):
+            DBList.clear()
             self.DBScrolledlistbox.delete(0, END)
             b = self.DBBrandTCombobox.get()
+            brand = self.DBBrandTCombobox.get()
             m = re.sub('[/]', '@', self.DBModelTCombobox.get())
             filePath = path + "/" + "TOOL_DATABASE" + "/" + b + "/" + m
             finalPath = str(filePath)
+            tempList = []
+            intList = []
+            strList = []
+            somesortedIntList = []
 
             with open(finalPath, "r") as toolTextFile:
                 toolDict = toolTextFile.read()
@@ -747,7 +916,47 @@ class Toplevel1:
             for i in (dict):
                 values = list(dict[i])
                 values.insert(0, i)
-                self.DBScrolledlistbox.insert(END, values)
+                tempList.append(values)
+
+            for x in tempList:
+                try:
+                    int1 = int(x[0])
+                    x.pop(0)
+                    x.insert(0, int1)
+                    intList.append(x)
+                except ValueError:
+                    strList.append(x)
+
+            intList.sort(key=lambda x: x[0])
+            strList.sort(key=lambda x: x[0])
+
+            for x in intList:
+                str1 = str(x[0])
+                x.pop(0)
+                x.insert(0, str1)
+                somesortedIntList.append(x)
+
+            if not somesortedIntList == [] and not strList == []:
+                someList = somesortedIntList + strList
+            if strList == [] and not somesortedIntList == []:
+                someList = somesortedIntList
+            if not strList == [] and somesortedIntList == []:
+                someList = strList
+            if somesortedIntList == [] and strList == []:
+                someList = tempList
+
+            for i in someList:
+                DBList.append(i)
+                self.DBScrolledlistbox.insert(END, i)
+
+            finalPath = os.path.join(
+                path + "/" + "TOOL_DATABASE" + "/" + brand, m)
+            finalDict = {}
+            for x in DBList:
+                finalDict[x[0]] = x[1], x[2]
+
+            toolFile = open(finalPath, "w")
+            toolFile.write(str(finalDict))
 
         def doclick(*args):
             pyautogui.tripleClick()
@@ -757,6 +966,18 @@ class Toplevel1:
                 m1.tk_popup(event.x_root, event.y_root)
             finally:
                 m1.grab_release()
+
+        def DBdoPopUp(event):
+            try:
+                m2.tk_popup(event.x_root, event.y_root)
+            finally:
+                m2.grab_release()
+
+        def setdoPopUp(event):
+            try:
+                m3.tk_popup(event.x_root, event.y_root)
+            finally:
+                m3.grab_release()
 
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
@@ -834,6 +1055,12 @@ class Toplevel1:
         m1 = Menu(root, tearoff=0)
         m1.add_command(label="Edit", command=edSel)
         m1.add_command(label="Delete", command=deleteFromList)
+
+        m2 = Menu(root, tearoff=0)
+        m2.add_command(label="Delete", command=DBdeleteFromList)
+
+        m3 = Menu(root, tearoff=0)
+        m3.add_command(label="Delete", command=setDelCust)
 
         PNOTEBOOK = "ClosetabNotebook"
 
@@ -1008,12 +1235,15 @@ class Toplevel1:
         self.shipCombobox = ttk.Combobox(self.TLabelframe4)
         self.shipCombobox.place(
             relx=0.037, rely=0.351, relheight=0.211, relwidth=0.929, bordermode='ignore')
+        self.shipCombobox.configure(state='readonly')
         self.shipCombobox.configure(values=shipList())
         self.shipCombobox.configure(takefocus="")
+        self.shipCombobox.bind("L", keyPressL)
 
         self.billCombobox = ttk.Combobox(self.TLabelframe4)
         self.billCombobox.place(
             relx=0.037, rely=0.789, relheight=0.211, relwidth=0.929, bordermode='ignore')
+        self.billCombobox.configure(state='readonly')
         self.billCombobox.configure(values=billList())
         self.billCombobox.configure(takefocus="")
 
@@ -1529,16 +1759,20 @@ class Toplevel1:
         self.DBScrolledlistbox.configure(selectbackground="blue")
         self.DBScrolledlistbox.configure(selectforeground="white")
         self.DBScrolledlistbox.bind('<Double-1>', DBGrabInfo)
+        self.DBScrolledlistbox.bind('<3>', doclick)
+        self.DBScrolledlistbox.bind('<Triple-1>', DBdoPopUp)
 
-        self.DBRefreshButton = ttk.Button(self.PNotebook1_t1)
-        self.DBRefreshButton.place(relx=0.821, rely=0.045, height=35, width=86)
-        self.DBRefreshButton.configure(takefocus="")
-        self.DBRefreshButton.configure(text='''Refresh''')
+        self.DBSortButton = ttk.Button(self.PNotebook1_t1)
+        self.DBSortButton.place(relx=0.679, rely=0.042, height=35, width=96)
+        self.DBSortButton.configure(takefocus="")
+        self.DBSortButton.configure(text='''Sort List''')
+        self.DBSortButton.configure(command=DBtoolDataBaseB)
 
         self.BOCombobox1 = ttk.Combobox(self.PNotebook1_t5)
         self.BOCombobox1.place(relx=0.589, rely=0.063,
                                relheight=0.044, relwidth=0.398)
         self.BOCombobox1.configure(values=BOCustomerGet())
+        self.BOCombobox1.configure(state='readonly')
         self.BOCombobox1.configure(takefocus="")
         self.BOCombobox1.bind("<<ComboboxSelected>>", getBO)
 
@@ -1685,6 +1919,121 @@ class Toplevel1:
         self.BOEntry1.configure(selectbackground="blue")
         self.BOEntry1.configure(selectforeground="white")
         self.BOEntry1.configure(textvariable=var1)
+
+        self.BOBackButton = tk.Button(self.TNotebook2_t1)
+        self.BOBackButton.place(relx=0.018, rely=0.897, height=34, width=77)
+        self.BOBackButton.configure(activebackground="#ececec")
+        self.BOBackButton.configure(activeforeground="#000000")
+        self.BOBackButton.configure(background="#d9d9d9")
+        self.BOBackButton.configure(disabledforeground="#a3a3a3")
+        self.BOBackButton.configure(foreground="#000000")
+        self.BOBackButton.configure(highlightbackground="#d9d9d9")
+        self.BOBackButton.configure(highlightcolor="black")
+        self.BOBackButton.configure(pady="0")
+        self.BOBackButton.configure(text='''Back''')
+        self.BOBackButton.configure(command=BOBack)
+
+        self.BOPDFButton = tk.Button(self.PNotebook1_t5)
+        self.BOPDFButton.place(relx=0.75, rely=0.127, height=24, width=127)
+        self.BOPDFButton.configure(activebackground="#ececec")
+        self.BOPDFButton.configure(activeforeground="#000000")
+        self.BOPDFButton.configure(background="#d9d9d9")
+        self.BOPDFButton.configure(disabledforeground="#a3a3a3")
+        self.BOPDFButton.configure(foreground="#000000")
+        self.BOPDFButton.configure(highlightbackground="#d9d9d9")
+        self.BOPDFButton.configure(highlightcolor="black")
+        self.BOPDFButton.configure(pady="0")
+        self.BOPDFButton.configure(text='''Save To PDF''')
+        self.BOPDFButton.configure(command=BOPDF)
+
+        self.SetScrolledlistbox = ScrolledListBox(self.PNotebook1_t4)
+        self.SetScrolledlistbox.place(
+            relx=0.018, rely=0.085, relheight=0.708, relwidth=0.359)
+        self.SetScrolledlistbox.configure(background="white")
+        self.SetScrolledlistbox.configure(cursor="xterm")
+        self.SetScrolledlistbox.configure(disabledforeground="#a3a3a3")
+        self.SetScrolledlistbox.configure(font="TkFixedFont")
+        self.SetScrolledlistbox.configure(foreground="black")
+        self.SetScrolledlistbox.configure(highlightbackground="#d9d9d9")
+        self.SetScrolledlistbox.configure(highlightcolor="#d9d9d9")
+        self.SetScrolledlistbox.configure(selectbackground="blue")
+        self.SetScrolledlistbox.configure(selectforeground="white")
+        self.SetScrolledlistbox.bind("<3>", doclick)
+        self.SetScrolledlistbox.bind("<Triple-1>", setdoPopUp)
+
+        self.SetLabel1 = tk.Label(self.PNotebook1_t4)
+        self.SetLabel1.place(relx=0.018, rely=0.042, height=21, width=84)
+        self.SetLabel1.configure(background="#d9d9d9")
+        self.SetLabel1.configure(disabledforeground="#a3a3a3")
+        self.SetLabel1.configure(foreground="#000000")
+        self.SetLabel1.configure(text='''Customer List:''')
+
+        self.SetCustEntry = tk.Entry(self.PNotebook1_t4)
+        self.SetCustEntry.place(relx=0.018, rely=0.846,
+                                height=20, relwidth=0.364)
+        self.SetCustEntry.configure(background="white")
+        self.SetCustEntry.configure(disabledforeground="#a3a3a3")
+        self.SetCustEntry.configure(font="TkFixedFont")
+        self.SetCustEntry.configure(foreground="#000000")
+        self.SetCustEntry.configure(insertbackground="black")
+        self.SetCustEntry.bind("<Return>", addCustomerToListB)
+
+        self.SetUpButton = tk.Button(self.PNotebook1_t4)
+        self.SetUpButton.place(relx=0.107, rely=0.909, height=34, width=107)
+        self.SetUpButton.configure(activebackground="#ececec")
+        self.SetUpButton.configure(activeforeground="#000000")
+        self.SetUpButton.configure(background="#d9d9d9")
+        self.SetUpButton.configure(disabledforeground="#a3a3a3")
+        self.SetUpButton.configure(foreground="#000000")
+        self.SetUpButton.configure(highlightbackground="#d9d9d9")
+        self.SetUpButton.configure(highlightcolor="black")
+        self.SetUpButton.configure(pady="0")
+        self.SetUpButton.configure(text='''Update''')
+        self.SetUpButton.configure(command=addCustomerToList)
+
+        self.TSeparator4 = ttk.Separator(self.PNotebook1_t4)
+        self.TSeparator4.place(relx=0.393, rely=0.0,  relheight=1.036)
+        self.TSeparator4.configure(orient="vertical")
+
+        self.SetLabel2 = ttk.Label(self.PNotebook1_t4)
+        self.SetLabel2.place(relx=0.018, rely=0.803, height=19, width=115)
+        self.SetLabel2.configure(background="#d9d9d9")
+        self.SetLabel2.configure(foreground="#000000")
+        self.SetLabel2.configure(font="TkDefaultFont")
+        self.SetLabel2.configure(relief="flat")
+        self.SetLabel2.configure(anchor='w')
+        self.SetLabel2.configure(justify='left')
+        self.SetLabel2.configure(text='''Add New Customer:''')
+
+        self.SetLabel3 = tk.Label(self.PNotebook1_t4)
+        self.SetLabel3.place(relx=0.411, rely=0.021, height=21, width=84)
+        self.SetLabel3.configure(background="#d9d9d9")
+        self.SetLabel3.configure(disabledforeground="#a3a3a3")
+        self.SetLabel3.configure(foreground="#000000")
+        self.SetLabel3.configure(text='''Your Name:''')
+
+        self.SetNameEntry = tk.Entry(self.PNotebook1_t4)
+        self.SetNameEntry.place(relx=0.429, rely=0.063,
+                                height=20, relwidth=0.221)
+        self.SetNameEntry.configure(background="white")
+        self.SetNameEntry.configure(disabledforeground="#a3a3a3")
+        self.SetNameEntry.configure(font="TkFixedFont")
+        self.SetNameEntry.configure(foreground="#000000")
+        self.SetNameEntry.configure(insertbackground="black")
+        self.SetNameEntry.insert(END, setting())
+
+        self.SetSaveButton = tk.Button(self.PNotebook1_t4)
+        self.SetSaveButton.place(relx=0.786, rely=0.825, height=74, width=107)
+        self.SetSaveButton.configure(activebackground="#ececec")
+        self.SetSaveButton.configure(activeforeground="#000000")
+        self.SetSaveButton.configure(background="#d9d9d9")
+        self.SetSaveButton.configure(disabledforeground="#a3a3a3")
+        self.SetSaveButton.configure(foreground="#000000")
+        self.SetSaveButton.configure(highlightbackground="#d9d9d9")
+        self.SetSaveButton.configure(highlightcolor="black")
+        self.SetSaveButton.configure(pady="0")
+        self.SetSaveButton.configure(text='''Save''')
+        self.SetSaveButton.configure(command=setSave)
 
 
 # The following code is add to handle mouse events with the close icons
