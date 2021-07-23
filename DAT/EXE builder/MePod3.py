@@ -21,14 +21,22 @@ from tkinter import BooleanVar, ttk
 from tkinter import *
 import pyautogui
 import collections
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
+from email.mime.application import MIMEApplication
+import shutil
 py3 = True
 path = os.getcwd() + "/Dat"
+Epath = os.getcwd() + "/Dat/orders to be sent"
 finalPartsList = [["TOOL", "QUANTITY", "PART#", "DESCRIPTION"]]
 system = sys.platform
 DBList = []
 BOList = []
 CUSTOMER_LIST = []
-
+credlist = []
 
 # start support
 
@@ -95,6 +103,138 @@ class Toplevel1:
         setfile = open(filePath, "r")
         customerList = setfile.read()
         CUSTOMER_LIST = customerList.split(",")
+
+        csetFilePath = path + "/" + "cred"
+        cfilePath = str(csetFilePath)
+        csetfile = open(cfilePath, "r")
+        cList = csetfile.read()
+        credlist = cList.split(",")
+
+        self.special = 0
+
+        def veiworder2():
+            index = self.EScrolledlistbox2.curselection()[0]
+            file_name = self.EScrolledlistbox2.get(index)
+            file_path = Epath + "/" + file_name
+            os.startfile(file_path)
+            self.special = 0
+
+        def veiwOrder():
+            index = self.EScrolledlistbox1.curselection()[0]
+            file_name = self.EScrolledlistbox1.get(index)
+            file_path = Epath + "/" + file_name
+            os.startfile(file_path)
+            self.special = 0
+
+        def orderDel():
+            index = self.EScrolledlistbox1.curselection()[0]
+            file_path = Epath + "/" + self.EScrolledlistbox1.get(index)
+            os.remove(file_path)
+            self.EScrolledlistbox1.delete(index)
+            self.special = 0
+
+        def savecred(user, PASS):
+            str1 = ""
+            list1 = []
+            list1.append("1")
+            list1.append(user)
+            list1.append(PASS)
+            for x in list1:
+                str1 += x
+                str1 += ","
+            finalstr = str1[:-1]
+            setFile = open(path + "/" + "cred", "w")
+            n = setFile.write(finalstr)
+            setFile.close()
+
+        def delcred():
+            os.remove(path + "/" + "cred")
+            str1 = "0"
+            setFile = open(path + "/" + "cred", "w")
+            n = setFile.write(str1)
+            setFile.close()
+
+        def movefiles():
+            for i in self.EScrolledlistbox2.get(0, END):
+                shutil.move(path + "/temp/" + i, path + "/sent/" + i)
+            self.EScrolledlistbox2.delete(0, END)
+
+        def premove():
+            for i in self.EScrolledlistbox2.get(0, END):
+                shutil.move(Epath + "/" + i, path + "/temp/" + i)
+
+        def selectpdf(event):
+            if self.special == 0:
+                index = self.EScrolledlistbox1.curselection()[0]
+                self.EScrolledlistbox2.insert(
+                    END, self.EScrolledlistbox1.get(index))
+                self.EScrolledlistbox1.delete(index)
+
+        def unselectpdf(event):
+            if self.special == 0:
+                index = self.EScrolledlistbox2.curselection()[0]
+                self.EScrolledlistbox1.insert(
+                    END, self.EScrolledlistbox2.get(index))
+                self.EScrolledlistbox2.delete(index)
+
+        def collect_mail_info():
+            premove()
+            user = self.EEntry1.get()
+            PASS = self.EEntry2.get()
+            send_list = list(self.EEntry3.get().split(","))
+            subject = self.EEntry4.get()
+            body = self.EScrolledtext.get("1.0", END)
+            list2 = os.listdir(str(path + "/temp/"))
+            send_mail_gmail(user, PASS, send_list, subject, body, list2)
+            if self.ecb == True:
+                savecred(user, PASS)
+            else:
+                delcred()
+
+        def send_mail_gmail(user, PASS, send_list, subject="", body="", list2=None):
+            s = smtplib.SMTP('smtp.gmail.com:587')
+            s.starttls()
+            try:
+                s.login(user, PASS)
+                # s.set_debuglevel(1)
+                msg = MIMEMultipart()
+                sender = user
+                recipients = send_list
+                msg['Subject'] = subject
+                msg['From'] = sender
+                msg['To'] = ", ".join(recipients)
+                if list2 is not None:
+                    for file_path in list2:
+                        final_path = path + "/temp/" + file_path
+                        try:
+                            with open(final_path, "rb") as fp:
+                                part = MIMEBase('application', "octet-stream")
+                                part.set_payload((fp).read())
+                                # Encoding payload is necessary if encoded (compressed) file has to be attached.
+                                encoders.encode_base64(part)
+                                part.add_header(
+                                    'Content-Disposition', "attachment; filename= %s" % os.path.basename(file_path))
+                                msg.attach(part)
+                            msg.attach(MIMEText(body, 'html'))
+                            fail = False
+
+                        except:
+                            self.EMessage.configure(foreground="#f5010a")
+                            self.EMessage.configure(
+                                text='''FAILED_error_code:3''')
+                            fail = True
+                else:
+                    self.EMessage.configure(foreground="#f5010a")
+                    self.EMessage.configure(text='''FAILED_error_code:0''')
+                    fail = True
+                if fail == False:
+                    s.sendmail(sender, recipients, msg.as_string())
+                    self.EMessage.configure(highlightbackground="#d9d9d9")
+                    self.EMessage.configure(text='''sent_successful''')
+                    movefiles()
+            except:
+                self.EMessage.configure(foreground="#f5010a")
+                self.EMessage.configure(text='''invalid login crudentials''')
 
         def keySearch(key):
             counter = 0
@@ -446,6 +586,10 @@ class Toplevel1:
             d = datetime.datetime.today()
             return str(d.month) + "-" + str(d.day) + "-" + str(d.year)
 
+        def dateemailstr():
+            date = date_of_order()
+            return "parts order " + date
+
         def saveToMaster(customer1, data, date):
             customer = customer1.lstrip()
             for x in data:
@@ -549,6 +693,7 @@ class Toplevel1:
             elems.append(table)
 
             pdf.build(elems)
+            self.EScrolledlistbox1.insert(END, pdfName)
 
         def BOPDF():
             # stuffx = a
@@ -961,6 +1106,10 @@ class Toplevel1:
         def doclick(*args):
             pyautogui.tripleClick()
 
+        def doclickS(*args):
+            self.special += 1
+            pyautogui.tripleClick()
+
         def doPopUp(event):
             try:
                 m1.tk_popup(event.x_root, event.y_root)
@@ -978,6 +1127,20 @@ class Toplevel1:
                 m3.tk_popup(event.x_root, event.y_root)
             finally:
                 m3.grab_release()
+
+        def EMdoPopUp(event):
+            try:
+                m4.tk_popup(event.x_root, event.y_root)
+            finally:
+                self.special = 0
+                m4.grab_release()
+
+        def EM2doPopUp(event):
+            try:
+                m5.tk_popup(event.x_root, event.y_root)
+            finally:
+                self.special = 0
+                m5.grab_release()
 
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
@@ -1061,6 +1224,13 @@ class Toplevel1:
 
         m3 = Menu(root, tearoff=0)
         m3.add_command(label="Delete", command=setDelCust)
+
+        m4 = Menu(root, tearoff=0)
+        m4.add_command(label="View", command=veiwOrder)
+        m4.add_command(label="Delete", command=orderDel)
+
+        m5 = Menu(root, tearoff=0)
+        m5.add_command(label="View", command=veiworder2)
 
         PNOTEBOOK = "ClosetabNotebook"
 
@@ -2035,6 +2205,219 @@ class Toplevel1:
         self.SetSaveButton.configure(text='''Save''')
         self.SetSaveButton.configure(command=setSave)
 
+        self.ELabel2 = tk.Label(self.PNotebook1_t3)
+        self.ELabel2.place(relx=0.018, rely=0.042, height=11, width=34)
+        self.ELabel2.configure(background="#d9d9d9")
+        self.ELabel2.configure(disabledforeground="#a3a3a3")
+        self.ELabel2.configure(foreground="#000000")
+        self.ELabel2.configure(text='''Email:''')
+
+        self.EEntry1 = tk.Entry(self.PNotebook1_t3)
+        self.EEntry1.place(relx=0.018, rely=0.085, height=20, relwidth=0.311)
+        self.EEntry1.configure(background="white")
+        self.EEntry1.configure(disabledforeground="#a3a3a3")
+        self.EEntry1.configure(font="TkFixedFont")
+        self.EEntry1.configure(foreground="#000000")
+        self.EEntry1.configure(insertbackground="black")
+
+        self.ELabel3 = tk.Label(self.PNotebook1_t3)
+        self.ELabel3.place(relx=0.018, rely=0.148, height=11, width=54)
+        self.ELabel3.configure(background="#d9d9d9")
+        self.ELabel3.configure(cursor="fleur")
+        self.ELabel3.configure(disabledforeground="#a3a3a3")
+        self.ELabel3.configure(foreground="#000000")
+        self.ELabel3.configure(text='''Password:''')
+
+        self.EEntry2 = tk.Entry(self.PNotebook1_t3)
+        self.EEntry2.place(relx=0.018, rely=0.191, height=20, relwidth=0.311)
+        self.EEntry2.configure(background="white")
+        self.EEntry2.configure(disabledforeground="#a3a3a3")
+        self.EEntry2.configure(font="TkFixedFont")
+        self.EEntry2.configure(foreground="#000000")
+        self.EEntry2.configure(highlightbackground="#d9d9d9")
+        self.EEntry2.configure(highlightcolor="black")
+        self.EEntry2.configure(insertbackground="black")
+        self.EEntry2.configure(selectbackground="blue")
+        self.EEntry2.configure(selectforeground="white")
+
+        self.ESeparator1 = ttk.Separator(self.PNotebook1_t3)
+        self.ESeparator1.place(relx=0.0, rely=0.233,  relwidth=0.5)
+
+        self.ESeparator2 = ttk.Separator(self.PNotebook1_t3)
+        self.ESeparator2.place(relx=0.5, rely=0.0,  relheight=0.233)
+        self.ESeparator2.configure(orient="vertical")
+
+        self.ELabel1 = ttk.Label(self.PNotebook1_t3)
+        self.ELabel1.place(relx=0.196, rely=0.0, height=29, width=145)
+        self.ELabel1.configure(background="#d9d9d9")
+        self.ELabel1.configure(foreground="#000000")
+        self.ELabel1.configure(
+            font="-family {Segoe UI Black} -size 12 -weight bold")
+        self.ELabel1.configure(relief="flat")
+        self.ELabel1.configure(anchor='w')
+        self.ELabel1.configure(justify='left')
+        self.ELabel1.configure(text='''Email Credentials''')
+
+        self.EScrolledlistbox1 = ScrolledListBox(self.PNotebook1_t3)
+        self.EScrolledlistbox1.place(
+            relx=0.0, rely=0.445, relheight=0.39, relwidth=0.502)
+        self.EScrolledlistbox1.configure(background="white")
+        self.EScrolledlistbox1.configure(cursor="hand2")
+        self.EScrolledlistbox1.configure(disabledforeground="#a3a3a3")
+        self.EScrolledlistbox1.configure(font="TkFixedFont")
+        self.EScrolledlistbox1.configure(foreground="black")
+        self.EScrolledlistbox1.configure(highlightbackground="#d9d9d9")
+        self.EScrolledlistbox1.configure(highlightcolor="#d9d9d9")
+        self.EScrolledlistbox1.configure(selectbackground="blue")
+        self.EScrolledlistbox1.configure(selectforeground="white")
+        for i in os.listdir(str(Epath)):
+            self.EScrolledlistbox1.insert(END, i)
+        self.EScrolledlistbox1.bind("<Double-1>", selectpdf)
+        self.EScrolledlistbox1.bind("<3>", doclickS)
+        self.EScrolledlistbox1.bind("<Triple-1>", EMdoPopUp)
+
+        self.EScrolledlistbox2 = ScrolledListBox(self.PNotebook1_t3)
+        self.EScrolledlistbox2.place(
+            relx=0.5, rely=0.445, relheight=0.39, relwidth=0.502)
+        self.EScrolledlistbox2.configure(background="white")
+        self.EScrolledlistbox2.configure(cursor="hand2")
+        self.EScrolledlistbox2.configure(disabledforeground="#a3a3a3")
+        self.EScrolledlistbox2.configure(font="TkFixedFont")
+        self.EScrolledlistbox2.configure(foreground="black")
+        self.EScrolledlistbox2.configure(highlightbackground="#d9d9d9")
+        self.EScrolledlistbox2.configure(highlightcolor="#d9d9d9")
+        self.EScrolledlistbox2.configure(selectbackground="blue")
+        self.EScrolledlistbox2.configure(selectforeground="white")
+        self.EScrolledlistbox2.bind("<Double-1>", unselectpdf)
+        self.EScrolledlistbox2.bind("<3>", doclickS)
+        self.EScrolledlistbox2.bind("<Triple-1>", EM2doPopUp)
+
+        self.ELabel4 = tk.Label(self.PNotebook1_t3)
+        self.ELabel4.place(relx=0.518, rely=0.042, height=21, width=54)
+        self.ELabel4.configure(background="#d9d9d9")
+        self.ELabel4.configure(disabledforeground="#a3a3a3")
+        self.ELabel4.configure(foreground="#000000")
+        self.ELabel4.configure(text='''Send To:''')
+
+        self.EEntry3 = tk.Entry(self.PNotebook1_t3)
+        self.EEntry3.place(relx=0.518, rely=0.085, height=20, relwidth=0.471)
+        self.EEntry3.configure(background="white")
+        self.EEntry3.configure(disabledforeground="#a3a3a3")
+        self.EEntry3.configure(font="TkFixedFont")
+        self.EEntry3.configure(foreground="#000000")
+        self.EEntry3.configure(insertbackground="black")
+        self.EEntry3.insert(
+            END, "strujillo@metrostaple.com,falves@metrostaple.com")
+
+        self.ELabel5 = tk.Label(self.PNotebook1_t3)
+        self.ELabel5.place(relx=0.518, rely=0.148, height=21, width=54)
+        self.ELabel5.configure(background="#d9d9d9")
+        self.ELabel5.configure(disabledforeground="#a3a3a3")
+        self.ELabel5.configure(foreground="#000000")
+        self.ELabel5.configure(text='''Subject:''')
+
+        self.EEntry4 = tk.Entry(self.PNotebook1_t3)
+        self.EEntry4.place(relx=0.518, rely=0.191, height=20, relwidth=0.471)
+        self.EEntry4.configure(background="white")
+        self.EEntry4.configure(disabledforeground="#a3a3a3")
+        self.EEntry4.configure(font="TkFixedFont")
+        self.EEntry4.configure(foreground="#000000")
+        self.EEntry4.configure(insertbackground="black")
+        self.EEntry4.insert(END, dateemailstr())
+
+        self.EScrolledtext = ScrolledText(self.PNotebook1_t3)
+        self.EScrolledtext.place(relx=0.0, rely=0.318,
+                                 relheight=0.074, relwidth=1.009)
+        self.EScrolledtext.configure(background="white")
+        self.EScrolledtext.configure(font="TkTextFont")
+        self.EScrolledtext.configure(foreground="black")
+        self.EScrolledtext.configure(highlightbackground="#d9d9d9")
+        self.EScrolledtext.configure(highlightcolor="black")
+        self.EScrolledtext.configure(insertbackground="black")
+        self.EScrolledtext.configure(insertborderwidth="3")
+        self.EScrolledtext.configure(selectbackground="blue")
+        self.EScrolledtext.configure(selectforeground="white")
+        self.EScrolledtext.configure(wrap="none")
+
+        self.ELabel6 = tk.Label(self.PNotebook1_t3)
+        self.ELabel6.place(relx=0.018, rely=0.254, height=21, width=34)
+        self.ELabel6.configure(background="#d9d9d9")
+        self.ELabel6.configure(disabledforeground="#a3a3a3")
+        self.ELabel6.configure(foreground="#000000")
+        self.ELabel6.configure(text='''Body:''')
+
+        self.Label7E = tk.Label(self.PNotebook1_t3)
+        self.Label7E.place(relx=0.0, rely=0.403, height=21, width=274)
+        self.Label7E.configure(background="#d9d9d9")
+        self.Label7E.configure(disabledforeground="#a3a3a3")
+        self.Label7E.configure(foreground="#000000")
+        self.Label7E.configure(text='''Current Orders''')
+
+        self.ELabel8 = tk.Label(self.PNotebook1_t3)
+        self.ELabel8.place(relx=0.518, rely=0.403, height=21, width=264)
+        self.ELabel8.configure(background="#d9d9d9")
+        self.ELabel8.configure(disabledforeground="#a3a3a3")
+        self.ELabel8.configure(foreground="#000000")
+        self.ELabel8.configure(text='''Selected Orders''')
+
+        self.ESendButton = tk.Button(self.PNotebook1_t3)
+        self.ESendButton.place(relx=0.661, rely=0.845, height=64, width=187)
+        self.ESendButton.configure(activebackground="#ececec")
+        self.ESendButton.configure(activeforeground="#000000")
+        self.ESendButton.configure(background="#d9d9d9")
+        self.ESendButton.configure(disabledforeground="#a3a3a3")
+        self.ESendButton.configure(
+            font="-family {Segoe UI Black} -size 14 -weight bold")
+        self.ESendButton.configure(foreground="#000000")
+        self.ESendButton.configure(highlightbackground="#d9d9d9")
+        self.ESendButton.configure(highlightcolor="black")
+        self.ESendButton.configure(pady="0")
+        self.ESendButton.configure(text='''Send''')
+        self.ESendButton.configure(command=collect_mail_info)
+
+        self.EMessage = tk.Message(self.PNotebook1_t3)
+        self.EMessage.place(relx=0.018, rely=0.869,
+                            relheight=0.112, relwidth=0.625)
+        self.EMessage.configure(background="#d9d9d9")
+        self.EMessage.configure(
+            font="-family {Segoe UI Black} -size 12 -weight bold")
+        self.EMessage.configure(foreground="#00c600")
+        self.EMessage.configure(highlightbackground="#d9d9d9")
+        self.EMessage.configure(highlightcolor="black")
+        self.EMessage.configure(width=350)
+
+        self.EWarning = tk.Message(self.PNotebook1_t3)
+        self.EWarning.place(relx=0.375, rely=0.106,
+                            relheight=0.07, relwidth=0.125)
+        self.EWarning.configure(background="#d9d9d9")
+        self.EWarning.configure(font="-family {Segoe UI} -size 7 -weight bold")
+        self.EWarning.configure(foreground="#ff0000")
+        self.EWarning.configure(highlightbackground="#d9d9d9")
+        self.EWarning.configure(highlightcolor="black")
+        self.EWarning.configure(text='''Not Recomended!!''')
+        self.EWarning.configure(width=70)
+
+        self.ecb = BooleanVar()
+
+        self.ECheckbutton = tk.Checkbutton(self.PNotebook1_t3)
+        self.ECheckbutton.place(relx=0.357, rely=0.169,
+                                relheight=0.053, relwidth=0.127)
+        self.ECheckbutton.configure(activebackground="#ececec")
+        self.ECheckbutton.configure(activeforeground="#000000")
+        self.ECheckbutton.configure(background="#d9d9d9")
+        self.ECheckbutton.configure(disabledforeground="#a3a3a3")
+        self.ECheckbutton.configure(foreground="#000000")
+        self.ECheckbutton.configure(highlightbackground="#d9d9d9")
+        self.ECheckbutton.configure(highlightcolor="black")
+        self.ECheckbutton.configure(justify='left')
+        self.ECheckbutton.configure(text='''Save Info''')
+        self.ECheckbutton.configure(variable=self.ecb)
+
+        if credlist[0] == "1":
+            self.ECheckbutton.select()
+            self.EEntry1.insert(END, credlist[1])
+            self.EEntry2.insert(END, credlist[2])
+
 
 # The following code is add to handle mouse events with the close icons
 # in PNotebooks widgets.
@@ -2137,6 +2520,15 @@ def _create_container(func):
             '<Leave>', lambda e: _unbound_to_mousewheel(e, container))
         return func(cls, container, **kw)
     return wrapped
+
+
+class ScrolledText(AutoScroll, tk.Text):
+    '''A standard Tkinter Text widget with scrollbars that will
+    automatically show/hide as needed.'''
+    @ _create_container
+    def __init__(self, master, **kw):
+        tk.Text.__init__(self, master, **kw)
+        AutoScroll.__init__(self, master)
 
 
 class ScrolledListBox(AutoScroll, tk.Listbox):
