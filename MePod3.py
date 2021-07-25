@@ -240,17 +240,23 @@ class Toplevel1:
 
         def selectpdf(event):
             if self.special == 0:
-                index = self.EScrolledlistbox1.curselection()[0]
-                self.EScrolledlistbox2.insert(
-                    END, self.EScrolledlistbox1.get(index))
-                self.EScrolledlistbox1.delete(index)
+                try:
+                    index = self.EScrolledlistbox1.curselection()[0]
+                    self.EScrolledlistbox2.insert(
+                        END, self.EScrolledlistbox1.get(index))
+                    self.EScrolledlistbox1.delete(index)
+                except IndexError:
+                    return 0
 
         def unselectpdf(event):
             if self.special == 0:
-                index = self.EScrolledlistbox2.curselection()[0]
-                self.EScrolledlistbox1.insert(
-                    END, self.EScrolledlistbox2.get(index))
-                self.EScrolledlistbox2.delete(index)
+                try:
+                    index = self.EScrolledlistbox2.curselection()[0]
+                    self.EScrolledlistbox1.insert(
+                        END, self.EScrolledlistbox2.get(index))
+                    self.EScrolledlistbox2.delete(index)
+                except IndexError:
+                    return 0
 
         def saveFinalMaster():
             finalList = list(os.listdir(path + "/MASTER/final"))
@@ -435,14 +441,17 @@ class Toplevel1:
 
         def BOedSel(event):
             if self.special == 0:
-                self.TNotebook2.select(self.TNotebook2_t1)
                 w = event.widget
-                index = int(w.curselection()[0])
-                selected = list(self.BOScrolledlistbox.get(index))
-                self.BOMessage.configure(text=str(selected))
-                actualIndex = BOList.index(selected)
-                self.hiddenEntry.insert(END, actualIndex)
-                self.BOQuantEntry.delete(0, END)
+                try:
+                    index = int(w.curselection()[0])
+                    self.TNotebook2.select(self.TNotebook2_t1)
+                    selected = list(self.BOScrolledlistbox.get(index))
+                    self.BOMessage.configure(text=str(selected))
+                    actualIndex = BOList.index(selected)
+                    self.hiddenEntry.insert(END, actualIndex)
+                    self.BOQuantEntry.delete(0, END)
+                except IndexError:
+                    return 0
 
         def BOupdateB(*args):
             BOupdate()
@@ -493,15 +502,17 @@ class Toplevel1:
             cust = self.BOCombobox1.get()
             filePath = path + "/" + "MASTER/final/" + cust
             finalPath = str(filePath)
-
-            with open(finalPath, "r") as toolTextFile:
-                toolDict = toolTextFile.read()
-                dict = literal_eval(toolDict)
-            for i in (dict):
-                values = list(dict[i])
-                values.insert(0, i)
-                self.BOScrolledlistbox.insert(END, values)
-                BOList.append(values)
+            try:
+                with open(finalPath, "r") as toolTextFile:
+                    toolDict = toolTextFile.read()
+                    dict = literal_eval(toolDict)
+                for i in (dict):
+                    values = list(dict[i])
+                    values.insert(0, i)
+                    self.BOScrolledlistbox.insert(END, values)
+                    BOList.append(values)
+            except PermissionError:
+                return 0
 
         def BOCustomerGet():
             return(os.listdir(str(path + "/" + "MASTER/final")))
@@ -680,12 +691,15 @@ class Toplevel1:
             self.DBSchemEntry.delete(0, END)
             self.DBPartEntry.delete(0, END)
             self.DBDesEntry.delete(0, END)
-            index = int(w.curselection()[0])
-            value = w.get(index)
-            item = list(value)
-            self.DBSchemEntry.insert(END, item[0])
-            self.DBPartEntry.insert(END, item[1])
-            self.DBDesEntry.insert(END, item[2])
+            try:
+                index = int(w.curselection()[0])
+                value = w.get(index)
+                item = list(value)
+                self.DBSchemEntry.insert(END, item[0])
+                self.DBPartEntry.insert(END, item[1])
+                self.DBDesEntry.insert(END, item[2])
+            except IndexError:
+                    return 0
 
         def DBdeleteFromList():
             index = self.DBScrolledlistbox.curselection()[0]
@@ -996,103 +1010,112 @@ class Toplevel1:
 
         def selectFromList(event):
             w = event.widget
-            index = int(w.curselection()[0])
-            value = w.get(index)
-            item = list(value)
-            if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
-                for x in finalPartsList:
-                    if item[0] == x[2]:
-                        index1 = finalPartsList.index(x)
-                        count = int(x[1]) + 1
-                        finalPartsList.remove(x)
-                        self.finalListbox.delete(index1)
-                        item.insert(0, str(count))
-                        tool = self.brandCombobox.get() + " " + self.modelCombobox.get()
-                        item.insert(0, tool)
-                        if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
-                            finalPartsList.insert(index1, item)
-                            self.finalListbox.insert(index1, item)
-                            self.finalListbox.yview_moveto(0)
-                            self.finalListbox.yview_scroll(index1, "units")
-                        else:
-                            item.pop(2)
-                            finalPartsList.insert(index1, item)
-                            self.finalListbox.insert(index1, item)
-                            self.finalListbox.yview_moveto(0)
-                            self.finalListbox.yview_scroll(index1, "units")
-                        isThere = True
-                        break
-                    else:
-                        isThere = False
-            else:
-                for x in finalPartsList:
-                    if item[1] == x[2]:
-                        index1 = finalPartsList.index(x)
-                        count = int(x[1]) + 1
-                        finalPartsList.remove(x)
-                        self.finalListbox.delete(index1)
-                        item.insert(0, str(count))
-                        tool = self.brandCombobox.get() + " " + self.modelCombobox.get()
-                        item.insert(0, tool)
-                        if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
-                            finalPartsList.insert(index1, item)
-                            self.finalListbox.insert(index1, item)
-                            self.finalListbox.yview_moveto(0)
-                            self.finalListbox.yview_scroll(index1, "units")
-                        else:
-                            item.pop(2)
-                            finalPartsList.insert(index1, item)
-                            self.finalListbox.insert(index1, item)
-                            self.finalListbox.yview_moveto(0)
-                            self.finalListbox.yview_scroll(index1, "units")
-                            isThere = True
-                        break
-                    else:
-                        isThere = False
-
-            if isThere == False:
-                count = 1
-                item.insert(0, str(count))
-                tool = self.brandCombobox.get() + " " + self.modelCombobox.get()
-                item.insert(0, tool)
+            try:
+                index = int(w.curselection()[0])
+                value = w.get(index)
+                item = list(value)
                 if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
-                    finalPartsList.append(item)
-                    self.finalListbox.insert(END, item)
-                    self.finalListbox.yview_moveto(1)
+                    for x in finalPartsList:
+                        if item[0] == x[2]:
+                            index1 = finalPartsList.index(x)
+                            count = int(x[1]) + 1
+                            finalPartsList.remove(x)
+                            self.finalListbox.delete(index1)
+                            item.insert(0, str(count))
+                            tool = self.brandCombobox.get() + " " + self.modelCombobox.get()
+                            item.insert(0, tool)
+                            if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
+                                finalPartsList.insert(index1, item)
+                                self.finalListbox.insert(index1, item)
+                                self.finalListbox.yview_moveto(0)
+                                self.finalListbox.yview_scroll(index1, "units")
+                            else:
+                                item.pop(2)
+                                finalPartsList.insert(index1, item)
+                                self.finalListbox.insert(index1, item)
+                                self.finalListbox.yview_moveto(0)
+                                self.finalListbox.yview_scroll(index1, "units")
+                            isThere = True
+                            break
+                        else:
+                            isThere = False
                 else:
-                    item.pop(2)
-                    finalPartsList.append(item)
-                    self.finalListbox.insert(END, item)
-                    self.finalListbox.yview_moveto(1)
+                    for x in finalPartsList:
+                        if item[1] == x[2]:
+                            index1 = finalPartsList.index(x)
+                            count = int(x[1]) + 1
+                            finalPartsList.remove(x)
+                            self.finalListbox.delete(index1)
+                            item.insert(0, str(count))
+                            tool = self.brandCombobox.get() + " " + self.modelCombobox.get()
+                            item.insert(0, tool)
+                            if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
+                                finalPartsList.insert(index1, item)
+                                self.finalListbox.insert(index1, item)
+                                self.finalListbox.yview_moveto(0)
+                                self.finalListbox.yview_scroll(index1, "units")
+                            else:
+                                item.pop(2)
+                                finalPartsList.insert(index1, item)
+                                self.finalListbox.insert(index1, item)
+                                self.finalListbox.yview_moveto(0)
+                                self.finalListbox.yview_scroll(index1, "units")
+                                isThere = True
+                            break
+                        else:
+                            isThere = False
+
+                if isThere == False:
+                    count = 1
+                    item.insert(0, str(count))
+                    tool = self.brandCombobox.get().upper() + " " + self.modelCombobox.get().upper()
+                    item.insert(0, tool)
+                    if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
+                        finalPartsList.append(item)
+                        self.finalListbox.insert(END, item)
+                        self.finalListbox.yview_moveto(1)
+                    else:
+                        item.pop(2)
+                        finalPartsList.append(item)
+                        self.finalListbox.insert(END, item)
+                        self.finalListbox.yview_moveto(1)
+            except IndexError:
+                    return 0
 
         def modelList(event):
+            self.availablePartsListBox.delete(0, END)
             self.modelCombobox.delete(0, "end")
-            w = event.widget
-            sel = w.get()
-            List1 = os.listdir(path + "/TOOL_DATABASE/" + sel)
-            List2 = []
-            for x in List1:
-                a = x.replace("@", "/")
-                List2.append(a)
+            sel = self.brandCombobox.get()
+            try:
+                List1 = os.listdir(path + "/TOOL_DATABASE/" + sel)
+                List2 = []
+                for x in List1:
+                    a = x.replace("@", "/")
+                    List2.append(a)
 
-            ListB = List2
-            self.modelCombobox.configure(values=ListB)
+                ListB = List2
+                self.modelCombobox.configure(values=ListB)
+            except FileNotFoundError:
+                return 0
 
         ListA = os.listdir(str(path + "/" + "TOOL_DATABASE"))
         ListB = []
 
         def DBmodelList(event):
+            self.DBScrolledlistbox.delete(0, END)
             self.DBModelTCombobox.delete(0, "end")
-            w = event.widget
-            sel = w.get()
-            List1 = os.listdir(path + "/TOOL_DATABASE/" + sel)
-            List2 = []
-            for x in List1:
-                a = x.replace("@", "/")
-                List2.append(a)
+            sel = self.DBBrandTCombobox.get()
+            try:
+                List1 = os.listdir(path + "/TOOL_DATABASE/" + sel)
+                List2 = []
+                for x in List1:
+                    a = x.replace("@", "/")
+                    List2.append(a)
 
-            ListD = List2
-            self.DBModelTCombobox.configure(values=ListD)
+                ListD = List2
+                self.DBModelTCombobox.configure(values=ListD)
+            except FileNotFoundError:
+                return 0
 
         ListC = os.listdir(str(path + "/" + "TOOL_DATABASE"))
         ListD = []
@@ -1104,34 +1127,36 @@ class Toplevel1:
             m = re.sub('[/]', '@', self.modelCombobox.get())
             filePath = path + "/" + "TOOL_DATABASE" + "/" + b + "/" + m
             finalPath = str(filePath)
+            try:
+                with open(finalPath, "r") as toolTextFile:
+                    toolDict = toolTextFile.read()
+                    dict = literal_eval(toolDict)
+                for i in (dict):
+                    values = list(dict[i])
+                    values.insert(0, i)
+                    list4.append(values)
+                if check == "":
 
-            with open(finalPath, "r") as toolTextFile:
-                toolDict = toolTextFile.read()
-                dict = literal_eval(toolDict)
-            for i in (dict):
-                values = list(dict[i])
-                values.insert(0, i)
-                list4.append(values)
-            if check == "":
-
-                toolDataBase(1)
-            else:
-                self.availablePartsListBox.delete(0, END)
-                res = []
-
-                for x in list4:
-                    test1 = x[0]
-                    test2 = x[1]
-                    test3 = x[2]
-                    if test1.startswith(check) or test2.startswith(check) or test3.startswith(check):
-                        res.append(x)
-                if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
-                    for i in res:
-                        i.pop(0)
-                        self.availablePartsListBox.insert(END, i)
+                    toolDataBase(1)
                 else:
-                    for i in res:
-                        self.availablePartsListBox.insert(END, i)
+                    self.availablePartsListBox.delete(0, END)
+                    res = []
+
+                    for x in list4:
+                        test1 = x[0]
+                        test2 = x[1]
+                        test3 = x[2]
+                        if test1.startswith(check) or test2.startswith(check) or test3.startswith(check):
+                            res.append(x)
+                    if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
+                        for i in res:
+                            i.pop(0)
+                            self.availablePartsListBox.insert(END, i)
+                    else:
+                        for i in res:
+                            self.availablePartsListBox.insert(END, i)
+            except PermissionError:
+                return 0
 
         def callback1(var):
             check = self.BOEntry1.get().upper()
@@ -1161,25 +1186,29 @@ class Toplevel1:
             return 0
 
         def toolDataBase(event):
-
+            self.partSearchEntry.delete(0, END)
             self.availablePartsListBox.delete(0, END)
             b = self.brandCombobox.get()
             m = re.sub('[/]', '@', self.modelCombobox.get())
             filePath = path + "/" + "TOOL_DATABASE" + "/" + b + "/" + m
             finalPath = str(filePath)
+            try:
+                with open(finalPath, "r") as toolTextFile:
+                    toolDict = toolTextFile.read()
+                    dict = literal_eval(toolDict)
 
-            with open(finalPath, "r") as toolTextFile:
-                toolDict = toolTextFile.read()
-                dict = literal_eval(toolDict)
-
-            for i in (dict):
-                if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
-                    values = list(dict[i])
-                    self.availablePartsListBox.insert(END, values)
-                else:
-                    values = list(dict[i])
-                    values.insert(0, i)
-                    self.availablePartsListBox.insert(END, values)
+                for i in (dict):
+                    if self.brandCombobox.get() == "OMER" or self.brandCombobox.get() == "SENCO":
+                        values = list(dict[i])
+                        self.availablePartsListBox.insert(END, values)
+                    else:
+                        values = list(dict[i])
+                        values.insert(0, i)
+                        self.availablePartsListBox.insert(END, values)
+            except FileNotFoundError:
+                return 0
+            except PermissionError:
+                return 0
 
         def DBtoolDataBaseB():
             DBtoolDataBase(1)
@@ -1196,55 +1225,59 @@ class Toplevel1:
             intList = []
             strList = []
             somesortedIntList = []
+            try:
+                with open(finalPath, "r") as toolTextFile:
+                    toolDict = toolTextFile.read()
+                    dict = literal_eval(toolDict)
 
-            with open(finalPath, "r") as toolTextFile:
-                toolDict = toolTextFile.read()
-                dict = literal_eval(toolDict)
+                for i in (dict):
+                    values = list(dict[i])
+                    values.insert(0, i)
+                    tempList.append(values)
 
-            for i in (dict):
-                values = list(dict[i])
-                values.insert(0, i)
-                tempList.append(values)
+                for x in tempList:
+                    try:
+                        int1 = int(x[0])
+                        x.pop(0)
+                        x.insert(0, int1)
+                        intList.append(x)
+                    except ValueError:
+                        strList.append(x)
 
-            for x in tempList:
-                try:
-                    int1 = int(x[0])
+                intList.sort(key=lambda x: x[0])
+                strList.sort(key=lambda x: x[0])
+
+                for x in intList:
+                    str1 = str(x[0])
                     x.pop(0)
-                    x.insert(0, int1)
-                    intList.append(x)
-                except ValueError:
-                    strList.append(x)
+                    x.insert(0, str1)
+                    somesortedIntList.append(x)
 
-            intList.sort(key=lambda x: x[0])
-            strList.sort(key=lambda x: x[0])
+                if not somesortedIntList == [] and not strList == []:
+                    someList = somesortedIntList + strList
+                if strList == [] and not somesortedIntList == []:
+                    someList = somesortedIntList
+                if not strList == [] and somesortedIntList == []:
+                    someList = strList
+                if somesortedIntList == [] and strList == []:
+                    someList = tempList
 
-            for x in intList:
-                str1 = str(x[0])
-                x.pop(0)
-                x.insert(0, str1)
-                somesortedIntList.append(x)
+                for i in someList:
+                    DBList.append(i)
+                    self.DBScrolledlistbox.insert(END, i)
 
-            if not somesortedIntList == [] and not strList == []:
-                someList = somesortedIntList + strList
-            if strList == [] and not somesortedIntList == []:
-                someList = somesortedIntList
-            if not strList == [] and somesortedIntList == []:
-                someList = strList
-            if somesortedIntList == [] and strList == []:
-                someList = tempList
+                finalPath = os.path.join(
+                    path + "/" + "TOOL_DATABASE" + "/" + brand, m)
+                finalDict = {}
+                for x in DBList:
+                    finalDict[x[0]] = x[1], x[2]
 
-            for i in someList:
-                DBList.append(i)
-                self.DBScrolledlistbox.insert(END, i)
-
-            finalPath = os.path.join(
-                path + "/" + "TOOL_DATABASE" + "/" + brand, m)
-            finalDict = {}
-            for x in DBList:
-                finalDict[x[0]] = x[1], x[2]
-
-            toolFile = open(finalPath, "w")
-            toolFile.write(str(finalDict))
+                toolFile = open(finalPath, "w")
+                toolFile.write(str(finalDict))
+            except PermissionError:
+                return 0
+            except FileNotFoundError:
+                return 0
 
         def doclick(*args):
             pyautogui.tripleClick()
@@ -1468,11 +1501,14 @@ class Toplevel1:
         self.TLabelframe3.configure(relief='')
         self.TLabelframe3.configure(text='''Tool Select''')
 
+        var3 = tk.StringVar()
+        var3.trace("w", lambda name, index, mode, var=var3: modelList(var))
+
         self.brandCombobox = ttk.Combobox(self.TLabelframe3)
         self.brandCombobox.place(
             relx=0.041, rely=0.35, relheight=0.205, relwidth=0.929, bordermode='ignore')
         self.brandCombobox.configure(takefocus="")
-        self.brandCombobox.configure(font=font)
+        self.brandCombobox.configure(font=font, textvariable=var3)
         self.brandCombobox.configure(values=getBrands())
         self.brandCombobox.bind("<<ComboboxSelected>>", modelList)
 
@@ -1500,10 +1536,13 @@ class Toplevel1:
         self.Label2.configure(highlightcolor="black")
         self.Label2.configure(text='''Model:''', font=font)
 
+        var4 = tk.StringVar()
+        var4.trace("w", lambda name, index, mode, var=var4: toolDataBase(var))
+
         self.modelCombobox = ttk.Combobox(self.TLabelframe3)
         self.modelCombobox.place(
             relx=0.041, rely=0.795, relheight=0.205, relwidth=0.929, bordermode='ignore')
-        # self.modelCombobox.configure(textvariable=)
+        self.modelCombobox.configure(textvariable=var4)
         self.modelCombobox.configure(takefocus="")
         self.modelCombobox.configure(values=ListB, font=font)
         self.modelCombobox.bind("<<ComboboxSelected>>", toolDataBase)
@@ -1862,18 +1901,24 @@ class Toplevel1:
             relx=0.0, rely=0.0, relheight=1.0, relwidth=1.0)
         self.PNotebook2_1.configure(style=PNOTEBOOK)
 
+        var5 = tk.StringVar()
+        var5.trace("w", lambda name, index, mode, var=var5: DBmodelList(var))
+
         self.DBBrandTCombobox = ttk.Combobox(self.PNotebook1_t1)
         self.DBBrandTCombobox.place(
             relx=0.018, rely=0.067, relheight=0.047, relwidth=0.255)
-        self.DBBrandTCombobox.configure(takefocus="")
+        self.DBBrandTCombobox.configure(takefocus="", textvariable=var5)
         self.DBBrandTCombobox.configure(values=DBgetBrands(), font=font)
-        self.DBBrandTCombobox.bind("<<ComboboxSelected>>", DBmodelList)
+        #self.DBBrandTCombobox.bind("<<ComboboxSelected>>", DBmodelList)
+
+        var6 = tk.StringVar()
+        var6.trace("w", lambda name, index, mode, var=var6: DBtoolDataBase(var))
 
         self.DBModelTCombobox = ttk.Combobox(self.PNotebook1_t1)
         self.DBModelTCombobox.place(
             relx=0.304, rely=0.067, relheight=0.047, relwidth=0.255)
-        self.DBModelTCombobox.configure(takefocus="", font=font)
-        self.DBModelTCombobox.bind("<<ComboboxSelected>>", DBtoolDataBase)
+        self.DBModelTCombobox.configure(takefocus="", font=font, textvariable=var6)
+        #self.DBModelTCombobox.bind("<<ComboboxSelected>>", DBtoolDataBase)
         self.DBModelTCombobox.bind('<Return>', DBtoolDataBase)
 
         self.DBTLabel1 = ttk.Label(self.PNotebook1_t1)
