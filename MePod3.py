@@ -199,6 +199,10 @@ class Toplevel1:
             index = self.EScrolledlistbox1.curselection()[0]
             file_path = Epath + "/" + self.EScrolledlistbox1.get(index)
             os.remove(file_path)
+            tpath = path + "/" + "MASTER/temp/" + \
+                self.EScrolledlistbox1.get(index)[13:]
+            fpath = tpath[:-15]
+            os.remove(fpath)
             self.EScrolledlistbox1.delete(index)
             self.special = 0
 
@@ -248,8 +252,54 @@ class Toplevel1:
                     END, self.EScrolledlistbox2.get(index))
                 self.EScrolledlistbox2.delete(index)
 
+        def saveFinalMaster():
+            finalList = list(os.listdir(path + "/MASTER/final"))
+            tempList = []
+            for i in self.EScrolledlistbox2.get(0, END):
+                tempList.append(i[13:-15])
+            for tmpCus in tempList:
+                isThere = False
+                for x in finalList:
+                    if x == tmpCus:
+                        isThere = True
+                        break
+                if isThere == False:
+                    shutil.move(path + "/MASTER/temp/" + tmpCus,
+                                path + "/MASTER/final/" + tmpCus)
+                else:
+                    tempDict = {}
+                    finalPath = path + "/MASTER/final/" + tmpCus
+                    tempPath = path + "/MASTER/temp/" + tmpCus
+                    with open(finalPath, "r") as toolTextFile:
+                        Dict1 = toolTextFile.read()
+                        olddict = literal_eval(Dict1)
+                    with open(tempPath, "r") as toolTextFile:
+                        Dict2 = toolTextFile.read()
+                        newdict = literal_eval(Dict2)
+                    for x in (newdict):
+                        values = list(newdict[x])
+                        values.insert(0, x)
+                        if x in olddict.keys():
+                            list1 = list(olddict.get(x))
+                            newCount = int(values[2]) + int(list1[1])
+                            list1.pop(1)
+                            list1.insert(1, str(newCount))
+                            tempDict[values[0]
+                                     ] = list1[0], list1[1], list1[2], list1[3]
+                            olddict.pop(x)
+                        else:
+                            tempDict[values[0]
+                                     ] = values[1], values[2], values[3], values[4]
+                    finalDict = {**tempDict, **olddict}
+                    toolFile = open(finalPath, "w")
+                    toolFile.write(str(finalDict))
+                    toolFile.close()
+                    toolTextFile.close()
+                    os.remove(path + "/MASTER/temp/" + tmpCus)
+
         def collect_mail_info():
             premove()
+            saveFinalMaster()
             user = self.EEntry1.get()
             PASS = self.EEntry2.get()
             send_list = list(self.EEntry3.get().split(","))
@@ -403,9 +453,9 @@ class Toplevel1:
             dict1 = {}
             for x in self.BOScrolledlistbox.get(0, END):
                 dict1[x[0]] = x[1], x[2], x[3], x[4]
-            os.remove(path + "/" + "MASTER" + "/" + self.BOCombobox1.get())
+            os.remove(path + "/" + "MASTER/final/" + self.BOCombobox1.get())
             finalPath = os.path.join(
-                path + "/" + "MASTER", self.BOCombobox1.get())
+                path + "/" + "MASTER/final", self.BOCombobox1.get())
             toolFile = open(finalPath, "w")
             toolFile.write(str(dict1))
 
@@ -429,9 +479,9 @@ class Toplevel1:
             dict1 = {}
             for x in self.BOScrolledlistbox.get(0, END):
                 dict1[x[0]] = x[1], x[2], x[3], x[4]
-            os.remove(path + "/" + "MASTER" + "/" + self.BOCombobox1.get())
+            os.remove(path + "/MASTER/final/" + self.BOCombobox1.get())
             finalPath = os.path.join(
-                path + "/" + "MASTER", self.BOCombobox1.get())
+                path + "/MASTER/final", self.BOCombobox1.get())
             toolFile = open(finalPath, "w")
             toolFile.write(str(dict1))
 
@@ -441,7 +491,7 @@ class Toplevel1:
             self.TNotebook2.select(self.TNotebook2_t2)
             self.BOScrolledlistbox.delete(0, END)
             cust = self.BOCombobox1.get()
-            filePath = path + "/" + "MASTER" + "/" + cust
+            filePath = path + "/" + "MASTER/final/" + cust
             finalPath = str(filePath)
 
             with open(finalPath, "r") as toolTextFile:
@@ -454,7 +504,7 @@ class Toplevel1:
                 BOList.append(values)
 
         def BOCustomerGet():
-            return(os.listdir(str(path + "/" + "MASTER")))
+            return(os.listdir(str(path + "/" + "MASTER/final")))
 
         def shipList():
             setFilePath = path + "/" + "settings"
@@ -691,38 +741,31 @@ class Toplevel1:
 
         def saveToMaster(customer1, data, date):
             customer = customer1.lstrip()
-            for x in data:
-                key = x[2]
-                tool = x[0]
-                desc = x[3]
-                quant = x[1]
-                filePath = os.path.join(path + "/" + "MASTER", customer)
-                if key != "PART#":
-                    if os.path.isfile(filePath) == False:
+            filePath = path + "/" + "MASTER/temp/" + customer
+            toolDict = {}
+            if os.path.isfile(filePath) == True:
+                os.remove(filePath)
+                for x in data:
+                    key = x[2]
+                    tool = x[0]
+                    desc = x[3]
+                    quant = x[1]
+                    if key != "PART#":
                         toolFile = open(filePath, "w")
-                        toolDict = {}
                         toolDict[key] = tool, quant, desc, date
                         toolFile.write(str(toolDict))
-                    else:
-                        toolFile = open(filePath, "r")
-                        oldDict = toolFile.read()
-                        strToDict = literal_eval(oldDict)
-                        if key in strToDict:
-                            list1 = list(strToDict[key])
-                            newQuant = int(quant) + int(list1[1])
-                            newDict = {}
-                            newDict[key] = tool, newQuant, desc, date
-                            strToDict = literal_eval(oldDict)
-                            finalDict = {**strToDict, **newDict}
-                            toolFile = open(filePath, "w")
-                            toolFile.write(str(finalDict))
-                        else:
-                            newDict = {}
-                            newDict[key] = tool, quant, desc, date
-                            strToDict = literal_eval(oldDict)
-                            finalDict = {**strToDict, **newDict}
-                            toolFile = open(filePath, "w")
-                            toolFile.write(str(finalDict))
+            else:
+                for x in data:
+                    key = x[2]
+                    tool = x[0]
+                    desc = x[3]
+                    quant = x[1]
+                    if key != "PART#":
+                        toolFile = open(filePath, "w")
+                        toolDict[key] = tool, quant, desc, date
+                        toolFile.write(str(toolDict))
+
+            toolFile.close()
 
         def pdfMaker():
             # stuffx = a
@@ -735,9 +778,10 @@ class Toplevel1:
                 "SHIP: ", shipTo], ["DATE: ", dateOfOrder]]
             data = finalPartsList
 
-            saveToMaster(customer, data, dateOfOrder)
-
             save_path = path + "/orders to be sent/" + pdfName
+
+            if os.path.isfile(save_path) == False:
+                self.EScrolledlistbox1.insert(END, pdfName)
 
             pdf = SimpleDocTemplate(save_path, pagesize=letter)
 
@@ -792,7 +836,7 @@ class Toplevel1:
             elems.append(table)
 
             pdf.build(elems)
-            self.EScrolledlistbox1.insert(END, pdfName)
+            saveToMaster(customer, data, dateOfOrder)
 
         def BOPDF():
             # stuffx = a
@@ -2065,7 +2109,7 @@ class Toplevel1:
         self.BOQuantEntry.bind("<Return>", BOupdateB)
 
         self.BOLabel4 = tk.Label(self.TNotebook2_t1)
-        self.BOLabel4.place(relx=0.464, rely=0.385, height=23, width=220)
+        self.BOLabel4.place(relx=0.450, rely=0.385, height=23, width=210)
         self.BOLabel4.configure(activebackground="#f9f9f9")
         self.BOLabel4.configure(activeforeground="black")
         self.BOLabel4.configure(background=background)
