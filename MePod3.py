@@ -259,10 +259,11 @@ class Toplevel1:
                     return 0
 
         def saveFinalMaster():
+            length = 6 + len(date_of_order())
             finalList = list(os.listdir(path + "/MASTER/final"))
             tempList = []
             for i in self.EScrolledlistbox2.get(0, END):
-                tempList.append(i[13:-14])
+                tempList.append(i[13:-length])
             for tmpCus in tempList:
                 isThere = False
                 for x in finalList:
@@ -699,7 +700,7 @@ class Toplevel1:
                 self.DBPartEntry.insert(END, item[1])
                 self.DBDesEntry.insert(END, item[2])
             except IndexError:
-                    return 0
+                return 0
 
         def DBdeleteFromList():
             index = self.DBScrolledlistbox.curselection()[0]
@@ -1080,7 +1081,7 @@ class Toplevel1:
                         self.finalListbox.insert(END, item)
                         self.finalListbox.yview_moveto(1)
             except IndexError:
-                    return 0
+                return 0
 
         def modelList(event):
             self.availablePartsListBox.delete(0, END)
@@ -1912,12 +1913,14 @@ class Toplevel1:
         #self.DBBrandTCombobox.bind("<<ComboboxSelected>>", DBmodelList)
 
         var6 = tk.StringVar()
-        var6.trace("w", lambda name, index, mode, var=var6: DBtoolDataBase(var))
+        var6.trace("w", lambda name, index, mode,
+                   var=var6: DBtoolDataBase(var))
 
         self.DBModelTCombobox = ttk.Combobox(self.PNotebook1_t1)
         self.DBModelTCombobox.place(
             relx=0.304, rely=0.067, relheight=0.047, relwidth=0.255)
-        self.DBModelTCombobox.configure(takefocus="", font=font, textvariable=var6)
+        self.DBModelTCombobox.configure(
+            takefocus="", font=font, textvariable=var6)
         #self.DBModelTCombobox.bind("<<ComboboxSelected>>", DBtoolDataBase)
         self.DBModelTCombobox.bind('<Return>', DBtoolDataBase)
 
