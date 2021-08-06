@@ -262,7 +262,7 @@ class Toplevel1:
             finalList = list(os.listdir(path + "/MASTER/final"))
             tempList = []
             for i in self.EScrolledlistbox2.get(0, END):
-                tempList.append(i[13:-15])
+                tempList.append(i[13:-14])
             for tmpCus in tempList:
                 isThere = False
                 for x in finalList:
